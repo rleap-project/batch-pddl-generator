@@ -33,6 +33,18 @@ class IntegerParameter:
         )
 
 
+def get_int(name, lower, upper, *, log=True):
+    return Int(
+        name,
+        lower=lower,
+        upper=upper,
+        default_value=lower,
+        log=log
+    )
+
+def get_enum(name, choices, default_value):
+    return CategoricalHyperparameter(name, choices, default_value=default_value)
+
 class GridAttr:
     def __init__(
         self,
@@ -331,6 +343,13 @@ DOMAINS = [
         "blocksworld",
         "blocksworld 4 {n} {seed}",
         [Int("n", lower=2, upper=100, default_value=2)],
+    ),
+
+    Domain(
+        "tetris",
+        "generator.py {rows} {block_type}",
+        [get_int("rows", lower=4, upper=1000),
+         get_enum("block_type", ["1", "2", "3", "4"], "1")],
     ),
 
     #Domain("floortile",
