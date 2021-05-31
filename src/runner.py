@@ -55,11 +55,6 @@ class Runner:
         logfilename = plan_dir / "run.log"
         errfilename = plan_dir / "run.err"
 
-        if int(str(plan_dir)[-1]) % 2 == 0:
-            self.command = ["ls"]
-        else:
-            self.command = ["ls", "oho"]
-
         with open(logfilename, "w") as logfile, open(errfilename, "w") as errfile:
             p = subprocess.Popen(
                 self.command,
@@ -77,6 +72,7 @@ class Runner:
 
         # Save results in JSON file.
         results = {"planner_exitcode": retcode}
+        print("Result:", results)
         with open(plan_dir / "properties.json", "w") as props:
             json.dump(
                 results,

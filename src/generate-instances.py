@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import os
 from pathlib import Path
 import random
 import resource
@@ -102,7 +103,11 @@ for domain in DOMAINS:
     if not (GENERATORS_DIR / domain / "domain.pddl").is_file() and not DOMAINS[domain].uses_per_instance_domain_file():
         sys.exit(f"Error: domain.pddl missing for {domain}")
 
-RUNNER = Runner(DOMAINS[ARGS.domain], ["ls"], ARGS.planner_time_limit, ARGS.planner_memory_limit, GENERATORS_DIR)
+IMAGE = Path(os.environ["SINGULARITY_IMAGES"]) / "ipc2018-agl-lapkt-bfws-pref.img"
+RUNNER = Runner(
+    DOMAINS[ARGS.domain],
+    ["bash", "run-singularity.sh", IMAGE, "domain.pddl", "problem.pddl", "sas_plan"],
+    ARGS.planner_time_limit, ARGS.planner_memory_limit, GENERATORS_DIR)
 
 
 def evaluate_configuration(cfg, seed=1):
