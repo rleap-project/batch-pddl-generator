@@ -95,6 +95,7 @@ utils.setup_logging(ARGS.debug)
 
 DOMAINS = domains.get_domains()
 logging.debug(f"{len(DOMAINS)} domains available: {sorted(DOMAINS)}")
+DOMAIN = DOMAINS[ARGS.domain]
 
 for domain in DOMAINS:
     if not (GENERATORS_DIR / domain / "domain.pddl").is_file() and not DOMAINS[domain].uses_per_instance_domain_file():
@@ -106,7 +107,7 @@ PLANNERS = {
 }
 IMAGE = Path(os.environ["SINGULARITY_IMAGES"]) / PLANNERS[ARGS.domain]
 RUNNER = Runner(
-    DOMAINS[ARGS.domain],
+    DOMAIN,
     ["bash", "run-singularity.sh", IMAGE, "domain.pddl", "problem.pddl", "sas_plan"],
     ARGS.planner_time_limit, ARGS.planner_memory_limit, GENERATORS_DIR)
 
@@ -136,8 +137,7 @@ def evaluate_configuration(cfg, seed=1):
 # Build Configuration Space which defines all parameters and their ranges.
 cs = ConfigurationSpace()
 
-domain = DOMAINS[ARGS.domain]
-cs.add_hyperparameters(domain.get_hyperparameters())
+cs.add_hyperparameters(DOMAIN.get_hyperparameters())
 
 scenario = Scenario(
     {
