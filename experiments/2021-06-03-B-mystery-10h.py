@@ -4,7 +4,7 @@ import project
 
 
 DOMAINS = [
-    "tetris",
+    "mystery",
 ]
 ATTRIBUTES = [
     project.Attribute("final_value", min_wins=True),
