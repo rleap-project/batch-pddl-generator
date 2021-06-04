@@ -52,14 +52,14 @@ def parse_args():
     parser.add_argument(
         "--planner-time-limit",
         type=float,
-        default=180,
-        help="Maximum time for each configuration (default: %(default)ss)",
+        default=1800,
+        help="Maximum time in seconds for each configuration (default: %(default)ss)",
     )
 
     parser.add_argument(
         "--planner-memory-limit",
         type=float,
-        default=3 * 1024,  # 3 GiB
+        default=4 * 1024,  # 4 GiB
         help="Maximum memory for each configuration in MiB (default: %(default)ss)",
     )
 
