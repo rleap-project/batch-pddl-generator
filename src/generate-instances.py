@@ -116,9 +116,10 @@ RUNNER = Runner(
 def store_results(cfg, seed, plan_dir, exitcode):
     # Save results in JSON file.
     results = {
-        "planner_exitcode": exitcode,
+        "domain": ARGS.domain,
         "parameters": cfg,
         "seed": int(seed),
+        "planner_exitcode": exitcode,
     }
     with open(plan_dir / "properties.json", "w") as props:
         json.dump(
