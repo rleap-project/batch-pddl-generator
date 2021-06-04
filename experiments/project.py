@@ -281,7 +281,7 @@ def get_smac_experiment(domains, runs_per_domain, attributes, extra_options=None
     if REMOTE:
         environment = BaselSlurmEnvironment(
             email=USER.email,
-            partition="infai_2",
+            partition="infai_1",
             memory_per_cpu="6354M")
     else:
         environment = LocalEnvironment(processes=2)
@@ -299,7 +299,7 @@ def get_smac_experiment(domains, runs_per_domain, attributes, extra_options=None
     for domain in domains:
         for seed in range(runs_per_domain):
             run = exp.add_run()
-            cmd = ["python3", str(DIR.parent / "src" / "generate-instances.py"),
+            cmd = [sys.executable, str(DIR.parent / "src" / "generate-instances.py"),
                 "--overall-time-limit", str(overall_time_limit),
                 "--planner-time-limit", str(planner_time_limit),
                 "--planner-memory-limit", str(planner_memory_limit),
