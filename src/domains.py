@@ -234,13 +234,16 @@ class Domain:
         self.attributes = attributes
         self.command_template = generator_command
         self.adapt_parameters = adapt_parameters
-        generator_attribute_names = {
+        attribute_names = {a.name for a in self.attributes}
+        attribute_names_in_command = {
             fn
             for _, fn, _, _ in Formatter().parse(self.command_template)
             if fn is not None and fn != "seed"
         }
-        if generator_attribute_names != set(param.name for param in self.attributes):
-            sys.exit(f"Error: in domain {name} the attributes don't match the generator command")
+        if attribute_names_in_command != attribute_names:
+            sys.exit(
+                f"Error: in domain {name} the attributes ({sorted(attribute_names)}) "
+                f"don't match the generator command ({sorted(attribute_names_in_command)})")
 
     def get_domain_file(self, generators_dir):
         return Path(generators_dir) / self.name / "domain.pddl"
@@ -356,6 +359,16 @@ DOMAINS = [
         "blocksworld 4 {n} {seed}",
         [Int("n", lower=2, upper=100, default_value=2)],
     ),
+
+    Domain(
+        "mystery",
+        "mystery -l {locations} -f {maxfuel} -s {maxspace} -v {vehicles} -c {cargos} -r {seed}",
+        [get_int("locations", lower=2, upper=1000),
+         get_int("maxfuel", lower=1, upper=1000),
+         get_int("maxspace", lower=1, upper=1000),
+         get_int("vehicles", lower=1, upper=1000),
+         get_int("cargos", lower=1, upper=1000),
+        ]),
 
     Domain(
         "tetris",

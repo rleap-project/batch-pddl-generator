@@ -100,7 +100,11 @@ for domain in DOMAINS:
     if not (GENERATORS_DIR / domain / "domain.pddl").is_file() and not DOMAINS[domain].uses_per_instance_domain_file():
         sys.exit(f"Error: domain.pddl missing for {domain}")
 
-IMAGE = Path(os.environ["SINGULARITY_IMAGES"]) / "ipc2018-agl-lapkt-bfws-pref.img"
+PLANNERS = {
+    "mystery": "ipc2018-agl-fd-remix.img",
+    "tetris": "ipc2018-agl-lapkt-bfws-pref.img",
+}
+IMAGE = Path(os.environ["SINGULARITY_IMAGES"]) / PLANNERS[ARGS.domain]
 RUNNER = Runner(
     DOMAINS[ARGS.domain],
     ["bash", "run-singularity.sh", IMAGE, "domain.pddl", "problem.pddl", "sas_plan"],
