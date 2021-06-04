@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import random
 import resource
+import subprocess
 import sys
 import warnings
 
@@ -15,6 +16,8 @@ import utils
 
 
 warnings.simplefilter(action="ignore", category=FutureWarning)
+warnings.simplefilter(action="ignore", category=DeprecationWarning)
+
 
 import numpy as np
 
@@ -80,12 +83,6 @@ def parse_args():
         default=REPO / "pddl-generators",
         help="Path to directory containing the PDDL generators (default: %(default)s)")
 
-    parser.add_argument(
-        "--smac-output-dir",
-        default="smac",
-        help="Directory where to store logs and temporary files (default: %(default)s)",
-    )
-
     return parser.parse_args()
 
 
@@ -115,13 +112,18 @@ def evaluate_configuration(cfg, seed=1):
     cfg = cfg.get_dictionary()
     logging.info(f"[{peak_memory} KB] Evaluate configuration {cfg} with seed {seed}")
 
-    plan_dir = RUNNER.generate_input_files(cfg, seed, OUTPUT_DIR)
-    if not plan_dir:
-        logging.error(f"Failed to generate task {cfg}")
+    try:
+        plan_dir = RUNNER.generate_input_files(cfg, seed, OUTPUT_DIR)
+    except domains.IllegalConfiguration as err:
+        logging.info(f"Skipping illegal configuration {cfg}: {err}")
         return 100
+    except subprocess.CalledProcessError as err:
+        logging.error(f"Failed to generate task {cfg}: {err}")
+        return 100
+
     exitcode = RUNNER.run_planner(plan_dir)
     if exitcode != 0:
-        logging.error(f"Failed to solve task {cfg}")
+        logging.info(f"Failed to solve task {cfg}")
         return 100
 
     return 0
@@ -145,7 +147,7 @@ scenario = Scenario(
         "memory_limit": None,
         # time limit for evaluate_cfg (we cut off planner runs ourselves)
         "cutoff": None,
-        "output_dir": "smac",
+        "output_dir": f"smac-{ARGS.domain}",
         # Disable pynisher.
         "limit_resources": False,
         # Run SMAC in parallel.

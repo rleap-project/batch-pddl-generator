@@ -15,6 +15,10 @@ TMP_DOMAIN = "tmp-domain.pddl"
 PRECISION = 0.1
 
 
+class IllegalConfiguration(Exception):
+    pass
+
+
 class IntegerParameter:
     def __init__(self, name, lower_b=1, upper_b=20, upper_m=5.0, log=True):
         self.name = name
@@ -245,6 +249,8 @@ class Domain:
         return self.attributes
 
     def get_generator_command(self, generators_dir, parameters, seed):
+        if self.adapt_parameters:
+            parameters = self.adapt_parameters(parameters)
         command = shlex.split(self.command_template.format(seed=seed, **parameters))
         command[0] = str((Path(generators_dir) / self.name / command[0]).resolve())
         # Call Python scripts with the correct Python interpreter.
@@ -338,6 +344,12 @@ def adapt_parameters_snake(parameters):
     return parameters
 
 
+def adapt_parameters_tetris(parameters):
+    if parameters["rows"] % 2 == 1:
+        raise IllegalConfiguration("number of rows must be even")
+    return parameters
+
+
 DOMAINS = [
     Domain(
         "blocksworld",
@@ -350,6 +362,7 @@ DOMAINS = [
         "generator.py {rows} {block_type}",
         [get_int("rows", lower=4, upper=1000),
          get_enum("block_type", ["1", "2", "3", "4"], "1")],
+         adapt_parameters=adapt_parameters_tetris,
     ),
 
     #Domain("floortile",

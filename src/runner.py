@@ -28,13 +28,7 @@ class Runner:
         domain_file = plan_dir / "domain.pddl"
         command = self.domain.get_generator_command(self.generators_dir, parameters, seed)
         logging.debug("Generator command: {}".format(" ".join(command)))
-
-        # If the generator fails, print error message and signal failure.
-        try:
-            self.domain.generate_problem(command, problem_file, domain_file)
-        except subprocess.CalledProcessError as err:
-            print(err, file=sys.stderr)
-            return ""
+        self.domain.generate_problem(command, problem_file, domain_file)
 
         if not domain_file.is_file():
             shutil.copy2(self.domain.get_domain_file(self.generators_dir), domain_file)
@@ -72,7 +66,7 @@ class Runner:
 
         # Save results in JSON file.
         results = {"planner_exitcode": retcode}
-        print("Result:", results)
+        logging.info(f"Result: {results}")
         with open(plan_dir / "properties.json", "w") as props:
             json.dump(
                 results,
