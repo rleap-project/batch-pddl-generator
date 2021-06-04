@@ -1,6 +1,7 @@
 #! /usr/bin/env python3
 
 import argparse
+import json
 import logging
 import os
 from pathlib import Path
@@ -112,6 +113,23 @@ RUNNER = Runner(
     ARGS.planner_time_limit, ARGS.planner_memory_limit, GENERATORS_DIR)
 
 
+def store_results(cfg, seed, plan_dir, exitcode):
+    # Save results in JSON file.
+    results = {
+        "planner_exitcode": exitcode,
+        "parameters": cfg,
+        "seed": int(seed),
+    }
+    with open(plan_dir / "properties.json", "w") as props:
+        json.dump(
+            results,
+            props,
+            indent=2,
+            separators=(",", ": "),
+            sort_keys=True,
+        )
+
+
 def evaluate_configuration(cfg, seed=1):
     peak_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     cfg = cfg.get_dictionary()
@@ -127,7 +145,10 @@ def evaluate_configuration(cfg, seed=1):
         return 100
 
     exitcode = RUNNER.run_planner(plan_dir)
-    if exitcode != 0:
+    store_results(cfg, seed, plan_dir, exitcode)
+    if exitcode == 0:
+        logging.info(f"Solved task {cfg}")
+    else:
         logging.info(f"Failed to solve task {cfg}")
         return 100
 

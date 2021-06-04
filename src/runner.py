@@ -1,10 +1,8 @@
-import json
 import logging
 from pathlib import Path
 import resource
 import shutil
 import subprocess
-import sys
 
 
 TMP_PLAN_DIR = "plan"
@@ -63,17 +61,5 @@ class Runner:
         for path in [logfilename, errfilename]:
             if path.stat().st_size == 0:
                 path.unlink()
-
-        # Save results in JSON file.
-        results = {"planner_exitcode": retcode}
-        logging.info(f"Result: {results}")
-        with open(plan_dir / "properties.json", "w") as props:
-            json.dump(
-                results,
-                props,
-                indent=2,
-                separators=(",", ": "),
-                sort_keys=True,
-            )
 
         return retcode
