@@ -6,9 +6,9 @@ from string import Formatter
 import subprocess
 import sys
 
-from ConfigSpace.hyperparameters import UniformFloatHyperparameter
-from ConfigSpace.hyperparameters import UniformIntegerHyperparameter as Int
+from ConfigSpace.hyperparameters import UniformIntegerHyperparameter
 from ConfigSpace.hyperparameters import CategoricalHyperparameter
+
 
 TMP_PROBLEM = "tmp-problem.pddl"
 TMP_DOMAIN = "tmp-domain.pddl"
@@ -19,26 +19,8 @@ class IllegalConfiguration(Exception):
     pass
 
 
-class IntegerParameter:
-    def __init__(self, name, lower_b=1, upper_b=20, upper_m=5.0, log=True):
-        self.name = name
-        self.min = lower_b
-        self.max = upper_b + 30 * upper_m
-        self.default = lower_b
-        self.log = log
-
-    def get_hyperparameters(self):
-        return Int(
-            f"{self.name}",
-            lower=self.min,
-            upper=self.max,
-            default_value=self.default,
-            log=self.log,
-        )
-
-
 def get_int(name, lower, upper, *, log=True):
-    return Int(
+    return UniformIntegerHyperparameter(
         name,
         lower=lower,
         upper=upper,
@@ -48,178 +30,6 @@ def get_int(name, lower, upper, *, log=True):
 
 def get_enum(name, choices, default_value):
     return CategoricalHyperparameter(name, choices, default_value=default_value)
-
-class GridAttr:
-    def __init__(
-        self,
-        name,
-        name_x,
-        name_y,
-        lower_x,
-        upper_x,
-        lower_m=0.1,
-        upper_m=3.0,
-        default_m=1.0,
-        level="false",
-    ):
-        self.name = name
-        self.name_x = name_x
-        self.name_y = name_y
-
-        self.lower_m = lower_m
-        self.upper_m = upper_m
-        self.default_m = default_m
-
-        self.lower_x = lower_x
-        self.upper_x = upper_x
-        self.level_enum = level
-
-        assert self.level_enum in ["false", "true", "choose"]
-
-    def get_level_enum(self, cfg):
-        if self.level_enum == "choose":
-            return cfg[f"{self.name}_level"]
-        else:
-            return self.level_enum
-
-    def has_lowest_value(self, cfg):
-        return self.lower_x == cfg[f"{self.name}_x"]
-
-    def get_hyperparameters(self, modifier=None):
-        attr = f"{modifier}_{self.name}" if modifier else self.name
-
-        H = [
-            UniformIntegerHyperparameter(
-                f"{attr}_x",
-                lower=self.lower_x,
-                upper=self.upper_x,
-                default_value=self.lower_x,
-            ),
-            UniformIntegerHyperparameter(
-                f"{attr}_maxdiff", lower=0, upper=5, default_value=3
-            ),
-            UniformFloatHyperparameter(
-                f"{attr}_m",
-                lower=self.lower_m,
-                upper=self.upper_m,
-                default_value=self.default_m,
-                q=PRECISION,
-            ),
-        ]
-
-        if self.level_enum == "choose":
-            assert (
-                modifier is None
-            )  # It does not make sense to have enum parameters and hierarchical linear attributes
-            H.append(
-                CategoricalHyperparameter(
-                    f"{attr}_level", ["true", "false"], default_value="false"
-                )
-            )
-
-        return H
-
-    def set_values(self, cfg, Y):
-        attr = self.name
-
-        val_x = (
-            self.lower_x if self.lower_x == self.upper_x else int(cfg.get(f"{attr}_x"))
-        )
-        m = float(cfg.get(f"{attr}_m"))
-        maxdiff = (
-            self.lower_x
-            if self.lower_x == self.upper_x
-            else int(cfg.get(f"{attr}_maxdiff"))
-        )
-        grid_values = []
-        for i in range(len(Y) * int(math.ceil(1 + m) + 2)):
-            for j in range(maxdiff + 1):
-                x = val_x + i
-                y = val_x + i + j
-                grid_values.append((x, y))
-
-        sorted_values = sorted(grid_values, key=lambda x: x[0] * x[1])
-
-        val = 0.0
-
-        for i, Yi in enumerate(Y):
-            Yi[self.name_x] = sorted_values[int(val)][0]
-            Yi[self.name_y] = sorted_values[int(val)][1]
-
-            val += m
-
-
-class ConstantAttr:
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
-
-    def get_hyperparameters(self, modifier=None):
-        return []
-
-    def get_level_enum(self, cfg):
-        return "false"
-
-    def set_values(self, cfg, Y):
-        for i, Yi in enumerate(Y):
-            Yi[self.name] = self.value
-
-    def has_lowest_value(self, cfg):
-        return True
-
-
-class EnumAttr:
-    def __init__(self, name, values):
-        self.values = values
-        self.name = name
-
-    def get_hyperparameters(self):
-        return [CategoricalHyperparameter(self.name, self.values)]
-
-    def get_level_enum(self, cfg):
-        return "false"
-
-    def set_values(self, cfg, Y):
-        value = cfg.get(self.name)
-        for i, Yi in enumerate(Y):
-            Yi[self.name] = value
-
-    def get_values(self):
-        return self.values
-
-
-def eliminate_duplicates(l):
-    seen = set()
-    seen_add = seen.add
-    return [
-        x for x in l if not (tuple(x.items()) in seen or seen_add(tuple(x.items())))
-    ]
-
-
-# Scale linear attributes, ensuring that all instances have different values.
-def get_linear_scaling_values(linear_attrs, cfg, num_tasks):
-    assert linear_attrs
-    num_generated = num_tasks
-
-    # Attempt this 20 times, each time generating twice as many configurations.
-    for _ in range(20):
-        result = [{} for _ in range(num_generated)]
-        for attr in linear_attrs:
-            attr.set_values(cfg, result)
-
-        result = eliminate_duplicates(result)
-
-        if len(result) >= num_tasks:
-            return result[:num_tasks]
-
-        num_generated *= 2
-
-    print("Warning: we cannot generate different attributes", cfg, linear_attrs)
-
-    result = [{} for _ in range(num_tasks)]
-    for attr in linear_attrs:
-        attr.set_values(cfg, result)
-    return result
 
 
 class Domain:
@@ -357,7 +167,7 @@ DOMAINS = [
     Domain(
         "blocksworld",
         "blocksworld 4 {n} {seed}",
-        [Int("n", lower=2, upper=100, default_value=2)],
+        [get_int("n", lower=2, upper=100)],
     ),
 
     Domain("floortile",
