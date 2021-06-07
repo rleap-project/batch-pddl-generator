@@ -103,7 +103,7 @@ for domain in DOMAINS:
         sys.exit(f"Error: domain.pddl missing for {domain}")
 
 PLANNERS = {
-    "mystery": "ipc2018-agl-fd-remix.img",
+    "mystery": "ipc2018-agl-lapkt-dual-bfws.img",
     "tetris": "ipc2018-agl-lapkt-bfws-pref.img",
 }
 IMAGE = Path(os.environ["SINGULARITY_IMAGES"]) / PLANNERS[ARGS.domain]
