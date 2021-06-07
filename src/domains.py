@@ -21,25 +21,16 @@ class IllegalConfiguration(Exception):
 
 def get_int(name, lower, upper, *, log=True):
     return UniformIntegerHyperparameter(
-        name,
-        lower=lower,
-        upper=upper,
-        default_value=lower,
-        log=log
+        name, lower=lower, upper=upper, default_value=lower, log=log
     )
+
 
 def get_enum(name, choices, default_value):
     return CategoricalHyperparameter(name, choices, default_value=default_value)
 
 
 class Domain:
-    def __init__(
-        self,
-        name,
-        generator_command,
-        attributes,
-        adapt_parameters=None
-    ):
+    def __init__(self, name, generator_command, attributes, adapt_parameters=None):
         self.name = name
         self.attributes = attributes
         self.command_template = generator_command
@@ -53,7 +44,8 @@ class Domain:
         if attribute_names_in_command != attribute_names:
             sys.exit(
                 f"Error: in domain {name} the attributes ({sorted(attribute_names)}) "
-                f"don't match the generator command ({sorted(attribute_names_in_command)})")
+                f"don't match the generator command ({sorted(attribute_names_in_command)})"
+            )
 
     def get_domain_file(self, generators_dir):
         return Path(generators_dir) / self.name / "domain.pddl"
@@ -169,43 +161,47 @@ DOMAINS = [
         "blocksworld 4 {n} {seed}",
         [get_int("n", lower=2, upper=100)],
     ),
-
-    Domain("floortile",
-           "floortile-generator.py name {rows} {columns} {robots} seq {seed}",
-           [
+    Domain(
+        "floortile",
+        "floortile-generator.py name {rows} {columns} {robots} seq {seed}",
+        [
             get_int("rows", lower=2, upper=10),
             get_int("columns", lower=2, upper=10),
             get_int("robots", lower=2, upper=10),
-           ],
-           adapt_parameters=adapt_parameters_floortile
+        ],
+        adapt_parameters=adapt_parameters_floortile,
     ),
-
     Domain(
         "mystery",
         "mystery -l {locations} -f {maxfuel} -s {maxspace} -v {vehicles} -c {cargos} -r {seed}",
-        [get_int("locations", lower=2, upper=1000),
-         get_int("maxfuel", lower=1, upper=1000),
-         get_int("maxspace", lower=1, upper=1000),
-         get_int("vehicles", lower=1, upper=1000),
-         get_int("cargos", lower=1, upper=1000),
-        ]),
-
+        [
+            get_int("locations", lower=2, upper=1000),
+            get_int("maxfuel", lower=1, upper=1000),
+            get_int("maxspace", lower=1, upper=1000),
+            get_int("vehicles", lower=1, upper=1000),
+            get_int("cargos", lower=1, upper=1000),
+        ],
+    ),
     Domain(
         "tetris",
         "generator.py {rows} {block_type}",
-        [get_int("rows", lower=4, upper=1000),
-         get_enum("block_type", ["1", "2", "3", "4"], "1")],
-         adapt_parameters=adapt_parameters_tetris,
+        [
+            get_int("rows", lower=4, upper=1000),
+            get_enum("block_type", ["1", "2", "3", "4"], "1"),
+        ],
+        adapt_parameters=adapt_parameters_tetris,
     ),
-
     Domain(
         "tpp",
-        "tpp -s {seed} -m {markets} -p {products} -t {trucks} -d {depots} -l {goods} " + TMP_PROBLEM,
-        [get_int("products", lower=2, upper=20),
-         get_int("markets", lower=1, upper=10),
-         get_int("trucks", lower=2, upper=10),
-         get_int("depots", lower=1, upper=10),
-         get_int("goods", lower=3, upper=10)],
+        "tpp -s {seed} -m {markets} -p {products} -t {trucks} -d {depots} -l {goods} "
+        + TMP_PROBLEM,
+        [
+            get_int("products", lower=2, upper=20),
+            get_int("markets", lower=1, upper=10),
+            get_int("trucks", lower=2, upper=10),
+            get_int("depots", lower=1, upper=10),
+            get_int("goods", lower=3, upper=10),
+        ],
     ),
 ]
 
