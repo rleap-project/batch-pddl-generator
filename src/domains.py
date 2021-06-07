@@ -157,6 +157,15 @@ def adapt_parameters_tetris(parameters):
 
 DOMAINS = [
     Domain(
+        "barman",
+        "barman-generator.py {cocktails} {ingredients} {shots} {seed}",
+        [
+            get_int("cocktails", lower=1, upper=10),
+            get_int("shots", lower=1, upper=5),
+            get_int("ingredients", lower=2, upper=6),
+        ],
+    ),
+    Domain(
         "blocksworld",
         "blocksworld 4 {n} {seed}",
         [get_int("n", lower=2, upper=100)],
