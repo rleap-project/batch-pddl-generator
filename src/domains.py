@@ -281,7 +281,7 @@ class Domain:
 
 
 def adapt_parameters_floortile(parameters):
-    parameters["num_robots"] = min(parameters["num_robots"], parameters["num_columns"])
+    parameters["robots"] = min(parameters["robots"], parameters["columns"])
     return parameters
 
 
@@ -360,6 +360,16 @@ DOMAINS = [
         [Int("n", lower=2, upper=100, default_value=2)],
     ),
 
+    Domain("floortile",
+           "floortile-generator.py name {rows} {columns} {robots} seq {seed}",
+           [
+            get_int("rows", lower=2, upper=10),
+            get_int("columns", lower=2, upper=10),
+            get_int("robots", lower=2, upper=10),
+           ],
+           adapt_parameters=adapt_parameters_floortile
+    ),
+
     Domain(
         "mystery",
         "mystery -l {locations} -f {maxfuel} -s {maxspace} -v {vehicles} -c {cargos} -r {seed}",
@@ -387,13 +397,6 @@ DOMAINS = [
          get_int("depots", lower=1, upper=10),
          get_int("goods", lower=3, upper=10)],
     ),
-
-    #Domain("floortile",
-    #       "floortile-generator.py name {num_rows} {num_columns} {num_robots} seq {seed}",
-    #       [GridAttr("grid", "num_columns", "num_rows", lower_x=2, upper_x=10, upper_m=10),
-    #        EnumAttr("num_robots", [2, 3, 4, 5])
-    #       ], adapt_parameters=adapt_parameters_floortile
-    #),
 ]
 
 
