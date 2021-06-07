@@ -106,7 +106,8 @@ PLANNERS = {
     "mystery": "ipc2018-agl-lapkt-dual-bfws.img",
     "tetris": "ipc2018-agl-lapkt-bfws-pref.img",
 }
-IMAGE = Path(os.environ["SINGULARITY_IMAGES"]) / PLANNERS[ARGS.domain]
+PLANNER = PLANNERS.get(ARGS.domain, "fd1906-lama-first.img")
+IMAGE = Path(os.environ["SINGULARITY_IMAGES"]) / PLANNER
 RUNNER = Runner(
     DOMAIN,
     ["bash", "run-singularity.sh", IMAGE, "domain.pddl", "problem.pddl", "sas_plan"],

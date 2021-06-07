@@ -5,6 +5,8 @@ import json
 from pathlib import Path
 import shutil
 
+import utils
+
 
 DIR = Path(__file__).resolve().parent
 REPO = DIR.parent
@@ -31,7 +33,7 @@ def main():
         if props["planner_exitcode"] != 0:
             continue
         print(f"Found {props}")
-        parameters = "-".join(str(v) for k, v in sorted(props["parameters"].items()))
+        parameters = utils.join_parameters(props["parameters"])
         seed = props["seed"]
         problem_name = f"p-{parameters}-{seed}.pddl"
         target_dir = destdir / props["domain"]

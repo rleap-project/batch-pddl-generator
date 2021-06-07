@@ -4,6 +4,8 @@ import resource
 import shutil
 import subprocess
 
+import utils
+
 
 TMP_PLAN_DIR = "plan"
 
@@ -18,7 +20,7 @@ class Runner:
 
     def generate_input_files(self, parameters, seed, output_dir):
         # Write problem file.
-        task_name = "_".join(f"{key}={value}" for key, value in sorted(parameters.items()))
+        task_name = utils.join_parameters(parameters)
         plan_dir = Path(output_dir) / TMP_PLAN_DIR / task_name / str(seed)
         shutil.rmtree(plan_dir, ignore_errors=True)
         plan_dir.mkdir(parents=True)

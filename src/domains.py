@@ -378,6 +378,16 @@ DOMAINS = [
          adapt_parameters=adapt_parameters_tetris,
     ),
 
+    Domain(
+        "tpp",
+        "tpp -s {seed} -m {markets} -p {products} -t {trucks} -d {depots} -l {goods} " + TMP_PROBLEM,
+        [get_int("products", lower=2, upper=20),
+         get_int("markets", lower=1, upper=10),
+         get_int("trucks", lower=2, upper=10),
+         get_int("depots", lower=1, upper=10),
+         get_int("goods", lower=3, upper=10)],
+    ),
+
     #Domain("floortile",
     #       "floortile-generator.py name {num_rows} {num_columns} {num_robots} seq {seed}",
     #       [GridAttr("grid", "num_columns", "num_rows", lower_x=2, upper_x=10, upper_m=10),
