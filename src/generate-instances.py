@@ -123,10 +123,20 @@ RUNNER = Runner(
 )
 
 
+def show_error_log(plan_dir):
+    try:
+        with open(plan_dir / "run.err") as f:
+            output = f.read()
+    except FileNotFoundError:
+        pass
+    else:
+        logging.error(f"\n\nError log:\n\n{output}\n\n")
+
+
 def parse_runtime(plan_dir):
     with open(plan_dir / "run.log") as f:
         output = f.read()
-    logging.debug(f"\n\n\n\n{output}\n\n\n\n")
+    logging.debug(f"\n\nPlanner output:\n\n{output}\n\n")
     match = re.search("Singularity runtime: (.+?)s", output)
     runtime = float(match.group(1))
     runtime = max(0.1, runtime)  # log(0) is undefined.
@@ -169,6 +179,7 @@ def evaluate_configuration(cfg, seed=1):
 
     exitcode = RUNNER.run_planner(plan_dir)
     store_results(cfg, seed, plan_dir, exitcode)
+    show_error_log(plan_dir)
     if exitcode == 0:
         logging.info(f"Solved task {cfg}")
     else:
