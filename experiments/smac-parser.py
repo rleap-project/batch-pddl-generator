@@ -42,7 +42,7 @@ class CommonParser(Parser):
 
 
 def error(content, props):
-    if props.get('optimize_exit_code') == 0:
+    if props.get('smac_exit_code') == 0:
         props['error'] = 'none'
     else:
         props['error'] = 'some-error-occured'
