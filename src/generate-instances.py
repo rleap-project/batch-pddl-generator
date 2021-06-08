@@ -3,7 +3,6 @@
 import argparse
 import json
 import logging
-import os
 from pathlib import Path
 import random
 import re
@@ -36,6 +35,9 @@ REPO = DIR.parent
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("domain", help="Domain name")
+    parser.add_argument("planner",
+        help="Path to Singularity-based planner. "
+        "It must accept three parameters: domain_file problem_file plan_file")
 
     parser.add_argument(
         "--max-configurations",
@@ -103,15 +105,12 @@ for domain in DOMAINS:
     if not (GENERATORS_DIR / domain / "domain.pddl").is_file() and not DOMAINS[domain].uses_per_instance_domain_file():
         sys.exit(f"Error: domain.pddl missing for {domain}")
 
-PLANNERS = {
-    "mystery": "ipc2018-agl-lapkt-dual-bfws.img",
-    "tetris": "ipc2018-agl-lapkt-bfws-pref.img",
-}
-PLANNER = PLANNERS.get(ARGS.domain, "fd1906-lama-first.img")
-IMAGE = Path(os.environ["SINGULARITY_IMAGES"]) / PLANNER
+PLANNER = Path(ARGS.planner)
+if not PLANNER.is_file():
+    sys.exit(f"planner not found: {PLANNER}")
 RUNNER = Runner(
     DOMAIN,
-    ["bash", "run-singularity.sh", IMAGE, "domain.pddl", "problem.pddl", "sas_plan"],
+    ["bash", "run-singularity.sh", PLANNER, "domain.pddl", "problem.pddl", "sas_plan"],
     ARGS.planner_time_limit, ARGS.planner_memory_limit, GENERATORS_DIR)
 
 
