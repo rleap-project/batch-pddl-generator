@@ -3,14 +3,7 @@ import sys
 
 
 def join_parameters(parameters: dict):
-    def format_value(value):
-        if isinstance(value, int):
-            return f"{value:02}"
-        elif isinstance(value, str):
-            return value
-        else:
-            raise ValueError(f"{value} has unknown parameter type {type(value)}")
-    return "-".join(format_value(value) for _, value in sorted(parameters.items()))
+    return "-".join(str(value) for _, value in sorted(parameters.items()))
 
 
 def setup_logging(debug):
