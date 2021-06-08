@@ -6,6 +6,7 @@ import logging
 import os
 from pathlib import Path
 import random
+import re
 import resource
 import subprocess
 import sys
@@ -114,6 +115,16 @@ RUNNER = Runner(
     ARGS.planner_time_limit, ARGS.planner_memory_limit, GENERATORS_DIR)
 
 
+def parse_runtime(plan_dir):
+    with open(plan_dir / "run.log") as f:
+        output = f.read()
+    logging.debug(f"\n\n\n\n{output}\n\n\n\n")
+    match = re.search("Singularity runtime: (.+?)s", output)
+    runtime = float(match.group(1))
+    runtime = max(0.1, runtime)  # log(0) is undefined.
+    return runtime
+
+
 def store_results(cfg, seed, plan_dir, exitcode):
     # Save results in JSON file.
     results = {
@@ -122,6 +133,8 @@ def store_results(cfg, seed, plan_dir, exitcode):
         "seed": int(seed),
         "planner_exitcode": exitcode,
     }
+    if exitcode == 0:
+        results["runtime"] = parse_runtime(plan_dir)
     with open(plan_dir / "properties.json", "w") as props:
         json.dump(
             results,
