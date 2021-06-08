@@ -1,3 +1,4 @@
-## TODOs
+# Simple instance generator (SIG)
 
-* Include `run-singularity.sh` in repo.
+Use SMAC to generate planning tasks that can be solved by a given planner
+within given resource limits.

@@ -12,7 +12,6 @@ from ConfigSpace.hyperparameters import CategoricalHyperparameter
 
 TMP_PROBLEM = "tmp-problem.pddl"
 TMP_DOMAIN = "tmp-domain.pddl"
-PRECISION = 0.1
 
 
 class IllegalConfiguration(Exception):
@@ -50,9 +49,6 @@ class Domain:
     def get_domain_file(self, generators_dir):
         return Path(generators_dir) / self.name / "domain.pddl"
 
-    def get_hyperparameters(self):
-        return self.attributes
-
     def get_generator_command(self, generators_dir, parameters, seed):
         if self.adapt_parameters:
             parameters = self.adapt_parameters(parameters)
@@ -62,9 +58,6 @@ class Domain:
         if command[0].endswith(".py"):
             command.insert(0, sys.executable)
         return command
-
-    def get_domain_filename(self, generators_dir):
-        return (Path(generators_dir) / self.name / "domain.pddl").resolve()
 
     def generate_problem(self, command, problem_file, domain_file):
         # Some generators print to a file, others print to stdout.

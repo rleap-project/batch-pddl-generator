@@ -116,7 +116,7 @@ if not PLANNER.is_file():
     sys.exit(f"planner not found: {PLANNER}")
 RUNNER = Runner(
     DOMAIN,
-    ["bash", "run-singularity.sh", PLANNER, "domain.pddl", "problem.pddl", "sas_plan"],
+    ["bash", DIR / "run-singularity.sh", PLANNER, "domain.pddl", "problem.pddl", "sas_plan"],
     ARGS.planner_time_limit,
     ARGS.planner_memory_limit,
     GENERATORS_DIR,
@@ -192,7 +192,7 @@ def evaluate_configuration(cfg, seed=1):
 # Build Configuration Space which defines all parameters and their ranges.
 cs = ConfigurationSpace()
 
-cs.add_hyperparameters(DOMAIN.get_hyperparameters())
+cs.add_hyperparameters(DOMAIN.attributes)
 
 scenario = Scenario(
     {
