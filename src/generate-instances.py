@@ -35,9 +35,11 @@ REPO = DIR.parent
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("domain", help="Domain name")
-    parser.add_argument("planner",
+    parser.add_argument(
+        "planner",
         help="Path to Singularity-based planner. "
-        "It must accept three parameters: domain_file problem_file plan_file")
+        "It must accept three parameters: domain_file problem_file plan_file",
+    )
 
     parser.add_argument(
         "--max-configurations",
@@ -85,7 +87,8 @@ def parse_args():
     parser.add_argument(
         "--generators-dir",
         default=REPO / "pddl-generators",
-        help="Path to directory containing the PDDL generators (default: %(default)s)")
+        help="Path to directory containing the PDDL generators (default: %(default)s)",
+    )
 
     return parser.parse_args()
 
@@ -102,7 +105,10 @@ logging.debug(f"{len(DOMAINS)} domains available: {sorted(DOMAINS)}")
 DOMAIN = DOMAINS[ARGS.domain]
 
 for domain in DOMAINS:
-    if not (GENERATORS_DIR / domain / "domain.pddl").is_file() and not DOMAINS[domain].uses_per_instance_domain_file():
+    if (
+        not (GENERATORS_DIR / domain / "domain.pddl").is_file()
+        and not DOMAINS[domain].uses_per_instance_domain_file()
+    ):
         sys.exit(f"Error: domain.pddl missing for {domain}")
 
 PLANNER = Path(ARGS.planner)
@@ -111,7 +117,10 @@ if not PLANNER.is_file():
 RUNNER = Runner(
     DOMAIN,
     ["bash", "run-singularity.sh", PLANNER, "domain.pddl", "problem.pddl", "sas_plan"],
-    ARGS.planner_time_limit, ARGS.planner_memory_limit, GENERATORS_DIR)
+    ARGS.planner_time_limit,
+    ARGS.planner_memory_limit,
+    GENERATORS_DIR,
+)
 
 
 def parse_runtime(plan_dir):

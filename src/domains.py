@@ -198,11 +198,11 @@ DOMAINS = [
         "mystery",
         "mystery -l {locations} -f {maxfuel} -s {maxspace} -v {vehicles} -c {cargos} -r {seed}",
         [
-            get_int("locations", lower=2, upper=10**5),
-            get_int("maxfuel", lower=1, upper=10**5),
-            get_int("maxspace", lower=1, upper=10**5),
-            get_int("vehicles", lower=1, upper=10**5),
-            get_int("cargos", lower=1, upper=10**5),
+            get_int("locations", lower=2, upper=10 ** 5),
+            get_int("maxfuel", lower=1, upper=10 ** 5),
+            get_int("maxspace", lower=1, upper=10 ** 5),
+            get_int("vehicles", lower=1, upper=10 ** 5),
+            get_int("cargos", lower=1, upper=10 ** 5),
         ],
     ),
     Domain(

@@ -26,7 +26,9 @@ class Runner:
         plan_dir.mkdir(parents=True)
         problem_file = plan_dir / "problem.pddl"
         domain_file = plan_dir / "domain.pddl"
-        command = self.domain.get_generator_command(self.generators_dir, parameters, seed)
+        command = self.domain.get_generator_command(
+            self.generators_dir, parameters, seed
+        )
         logging.debug("Generator command: {}".format(" ".join(command)))
         self.domain.generate_problem(command, problem_file, domain_file)
 
@@ -38,12 +40,13 @@ class Runner:
 
     def run_planner(self, plan_dir):
         """Run the planner in the given directory on the prepared task."""
+
         def set_limit(limit_type, limit):
             resource.setrlimit(limit_type, (limit, limit))
 
         def prepare_call():
             set_limit(resource.RLIMIT_CPU, self.time_limit)
-            set_limit(resource.RLIMIT_AS, self.memory_limit * 1024**2)  # bytes
+            set_limit(resource.RLIMIT_AS, self.memory_limit * 1024 ** 2)  # bytes
             set_limit(resource.RLIMIT_CORE, 0)
 
         logfilename = plan_dir / "run.log"

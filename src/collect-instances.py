@@ -43,7 +43,7 @@ def main():
     max_values = defaultdict(dict)
     for plan_dir in plan_dirs:
         try:
-            with open(plan_dir/ "properties.json") as f:
+            with open(plan_dir / "properties.json") as f:
                 props = json.load(f)
         except FileNotFoundError:
             continue
