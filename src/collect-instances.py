@@ -20,15 +20,15 @@ def parse_args():
     return parser.parse_args()
 
 
-def record_max_parameter_values(parameters, max_domain_values):
+def record_max_values(parameters, max_domain_values):
     for key, value in parameters.items():
         if key not in max_domain_values or value > max_domain_values[key]:
             max_domain_values[key] = value
 
 
-def print_max_parameter_values(max_parameter_values):
-    print("\nMax parameter values:\n")
-    for domain, max_values in sorted(max_parameter_values.items()):
+def print_max_values(max_values):
+    print("\nMax values:\n")
+    for domain, max_values in sorted(max_values.items()):
         print(f" {domain}")
         for key, value in sorted(max_values.items()):
             print(f"  {key}: {value}")
@@ -40,7 +40,7 @@ def main():
     expdir = Path(args.expdir)
     destdir = Path(args.destdir)
     plan_dirs = expdir.glob("runs-*-*/*/smac-*/run_*/plan/*/*/")
-    max_parameter_values = defaultdict(dict)
+    max_values = defaultdict(dict)
     for plan_dir in plan_dirs:
         try:
             with open(plan_dir/ "properties.json") as f:
@@ -50,7 +50,9 @@ def main():
         if props["planner_exitcode"] != 0:
             continue
         print(f"Found {props}")
-        record_max_parameter_values(props["parameters"], max_parameter_values[props["domain"]])
+        values = props["parameters"].copy()
+        values["planner_runtime"] = props["runtime"]
+        record_max_values(values, max_values[props["domain"]])
         parameters = utils.join_parameters(props["parameters"])
         seed = props["seed"]
         problem_name = f"p-{parameters}-{seed}.pddl"
@@ -64,7 +66,7 @@ def main():
         with open(target_dir / "README", "w") as f:
             print(f"Parameter order: {order}", file=f)
 
-    print_max_parameter_values(max_parameter_values)
+    print_max_values(max_values)
 
 
 main()
