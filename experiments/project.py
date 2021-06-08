@@ -292,7 +292,7 @@ def get_smac_experiment(domains, runs_per_domain, attributes, extra_options=None
     safety_time_limit = 23 * 60 * 60
     overall_time_limit = int(re.match(r".*-(\d+)h", exp.name).group(1)) * 60 * 60
     overall_memory_limit = 6 * 1024
-    planner_time_limit = 2 * 60 * 60 if REMOTE else 2
+    planner_time_limit = 5 * 60 * 60 if REMOTE else 2
     planner_memory_limit = 5 * 1024
     generators_dir = os.environ["PDDL_GENERATORS"]
 
