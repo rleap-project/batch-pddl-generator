@@ -146,6 +146,16 @@ DOMAINS = [
         [get_int("n", lower=2, upper=100)],
     ),
     Domain(
+        "childsnack",
+        "child-snack-generator.py pool {seed} {children} {trays} {gluten_factor} {constrainedness}",
+        [
+            get_int("children", lower=2, upper=100),
+            get_float("constrainedness", lower=1.0, upper=2.0),
+            get_int("trays", lower=2, upper=4),
+            get_float("gluten_factor", lower=0.4, upper=0.8),
+        ],
+    ),
+    Domain(
         "floortile",
         "floortile-generator.py name {rows} {columns} {robots} seq {seed}",
         [
