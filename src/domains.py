@@ -45,7 +45,7 @@ class Domain:
 
     def adapt_parameters(self, parameters):
         if self._adapt_parameters:
-            parameters = self._adapt_parameters(parameters)
+            parameters = self._adapt_parameters(parameters.copy())
         return parameters
 
     def get_generator_command(self, generators_dir, parameters, seed):
@@ -122,9 +122,15 @@ Max parameter values after first optimization (2h):
   planner_runtime: 8912.78
   vehicles: 6943
 
+  Runtime smaller than
+   1s: 6697, 10s: 5867, 20s: 1327, 50s: 1700, 100s: 1259, 200s: 1085, 500s: 882, 1000s: 161, 2000s: 12, 5000s: 3, 10000s: 5
+
  tetris
   block_type: 4
   rows: 272/1000
+
+  Runtime smaller than:
+   1s: 3634, 2s: 1332, 5s: 1954, 10s: 625, 20s: 620, 50s: 463, 100s: 131, 200s: 49, 500s: 31, 1000s: 8, 2000s: 4, 5000s: 1
 """
 DOMAINS = [
     Domain(
