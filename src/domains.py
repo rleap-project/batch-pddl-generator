@@ -72,6 +72,12 @@ class Domain:
         return TMP_DOMAIN in self.command_template
 
 
+def adapt_parameters_barman(parameters):
+    if parameters["shots"] < parameters["cocktails"]:
+        raise IllegalConfiguration("we need shots >= cocktails")
+    return parameters
+
+
 def adapt_parameters_floortile(parameters):
     parameters["robots"] = min(parameters["robots"], parameters["columns"])
     return parameters
@@ -138,7 +144,7 @@ DOMAINS = [
             get_int("cocktails", lower=1, upper=10),
             get_int("shots", lower=1, upper=5),
             get_int("ingredients", lower=2, upper=6),
-        ],
+        ], adapt_parameters=adapt_parameters_barman,
     ),
     Domain(
         "blocksworld",

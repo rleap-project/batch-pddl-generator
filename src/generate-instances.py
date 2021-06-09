@@ -173,14 +173,17 @@ def store_results(cfg, seed, plan_dir, exitcode):
 def evaluate_configuration(cfg, seed=1):
     peak_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     cfg = cfg.get_dictionary()
-    cfg = DOMAIN.adapt_parameters(cfg)
+
+    try:
+        cfg = DOMAIN.adapt_parameters(cfg)
+    except domains.IllegalConfiguration as err:
+        logging.info(f"Skipping illegal configuration {cfg}: {err}")
+        return 100
+
     logging.info(f"[{peak_memory} KB] Evaluate configuration {cfg} with seed {seed}")
 
     try:
         plan_dir = RUNNER.generate_input_files(cfg, seed, SMAC_RUN_DIR)
-    except domains.IllegalConfiguration as err:
-        logging.info(f"Skipping illegal configuration {cfg}: {err}")
-        return 100
     except subprocess.CalledProcessError as err:
         logging.error(f"Failed to generate task {cfg}: {err}")
         return 100
