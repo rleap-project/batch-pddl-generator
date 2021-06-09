@@ -98,12 +98,6 @@ def adapt_parameters_grid(parameters):
     return parameters
 
 
-def adapt_parameters_parking(parameters):
-    curbs = parameters["curbs"]
-    cars = 2 * (curbs - 1) + int(parameters["cars_diff"])
-    return {"curbs": curbs, "cars": cars}
-
-
 def adapt_parameters_tetris(parameters):
     if parameters["rows"] % 2 == 1:
         raise IllegalConfiguration("number of rows must be even")
