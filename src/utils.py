@@ -7,7 +7,7 @@ def join_parameters(parameters: dict):
         if isinstance(value, str):
             value = value.strip("-")
             if not value:
-                value = "none"
+                value = "empty"
         return str(value)
     return "-".join(format_value(value) for _, value in sorted(parameters.items()))
 
