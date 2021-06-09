@@ -155,6 +155,13 @@ def get_repo_base():
     sys.exit("repo base could not be found")
 
 
+def get_singularity_planner(name):
+    planner = Path(os.environ["SINGULARITY_IMAGES"]) / name
+    if not planner.is_file():
+        logging.critical(f"planner not found: {planner}")
+    return planner
+
+
 def add_evaluations_per_time(run):
     evaluations = run.get('evaluations')
     time = run.get('search_time')
@@ -292,7 +299,7 @@ def get_smac_experiment(domains, runs_per_domain, attributes, extra_options=None
     safety_time_limit = 23 * 60 * 60
     overall_time_limit = int(re.match(r".*-(\d+)h", exp.name).group(1)) * 60 * 60
     overall_memory_limit = 6 * 1024
-    planner_time_limit = 5 * 60 * 60 if REMOTE else 2
+    planner_time_limit = 5 * 60 * 60 if REMOTE else 5
     planner_memory_limit = 5 * 1024
     generators_dir = os.environ["PDDL_GENERATORS"]
 
