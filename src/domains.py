@@ -156,6 +156,16 @@ DOMAINS = [
         ],
     ),
     Domain(
+        "driverlog",
+        "dlgen {seed} {roadjunctions} {drivers} {packages} {trucks}",
+        [
+            get_int("drivers", lower=1, upper=100),
+            get_int("packages", lower=1, upper=100),
+            get_int("roadjunctions", lower=2, upper=100),
+            get_int("trucks", lower=1, upper=100),
+        ],
+    ),
+    Domain(
         "floortile",
         "floortile-generator.py name {rows} {columns} {robots} seq {seed}",
         [
