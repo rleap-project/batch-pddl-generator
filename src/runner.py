@@ -41,11 +41,13 @@ class Runner:
     def run_planner(self, plan_dir):
         """Run the planner in the given directory on the prepared task."""
 
-        def set_limit(limit_type, limit):
-            resource.setrlimit(limit_type, (limit, limit))
+        def set_limit(limit_type, soft, hard=None):
+            if hard is None:
+                hard = soft
+            resource.setrlimit(limit_type, (soft, hard))
 
         def prepare_call():
-            set_limit(resource.RLIMIT_CPU, self.time_limit)
+            set_limit(resource.RLIMIT_CPU, self.time_limit, hard=self.time_limit + 1)
             set_limit(resource.RLIMIT_AS, self.memory_limit * 1024 ** 2)  # bytes
             set_limit(resource.RLIMIT_CORE, 0)
 
