@@ -1,13 +1,12 @@
-import math
 from pathlib import Path
 import shlex
 import shutil
-from string import Formatter
 import subprocess
 import sys
 
-from ConfigSpace.hyperparameters import UniformIntegerHyperparameter
 from ConfigSpace.hyperparameters import CategoricalHyperparameter
+from ConfigSpace.hyperparameters import UniformFloatHyperparameter
+from ConfigSpace.hyperparameters import UniformIntegerHyperparameter
 
 
 TMP_PROBLEM = "tmp-problem.pddl"
@@ -24,6 +23,12 @@ def get_int(name, lower, upper, *, log=True):
     )
 
 
+def get_float(name, lower, upper, *, log=False, precision=0.01):
+    return UniformFloatHyperparameter(
+        name, lower=lower, upper=upper, default_value=lower, log=log, q=precision
+    )
+
+
 def get_enum(name, choices, default_value):
     return CategoricalHyperparameter(name, choices, default_value=default_value)
 
@@ -34,17 +39,6 @@ class Domain:
         self.attributes = attributes
         self.command_template = generator_command
         self._adapt_parameters = adapt_parameters
-        attribute_names = {a.name for a in self.attributes}
-        attribute_names_in_command = {
-            fn
-            for _, fn, _, _ in Formatter().parse(self.command_template)
-            if fn is not None and fn != "seed"
-        }
-        if attribute_names_in_command != attribute_names:
-            sys.exit(
-                f"Error: in domain {name} the attributes ({sorted(attribute_names)}) "
-                f"don't match the generator command ({sorted(attribute_names_in_command)})"
-            )
 
     def get_domain_file(self, generators_dir):
         return Path(generators_dir) / self.name / "domain.pddl"
@@ -98,51 +92,10 @@ def adapt_parameters_grid(parameters):
     return parameters
 
 
-def adapt_parameters_datanetwork(parameters):
-    parameters["items"] = parameters["layers"] + parameters["extra_items"]
-    parameters["scripts"] = (
-        max(1, parameters["items"] - 2) + parameters["extra_scripts"]
-    )
-    return parameters
-
-
-def adapt_parameters_logistics(parameters):
-    parameters["num_trucks"] = parameters["num_cities"] + parameters["extra_trucks"]
-    return parameters
-
-
 def adapt_parameters_parking(parameters):
     curbs = parameters["curbs"]
     cars = 2 * (curbs - 1) + int(parameters["cars_diff"])
     return {"curbs": curbs, "cars": cars}
-
-
-def adapt_parameters_storage(parameters):
-    crates, hoists, store_areas, depots = (
-        parameters["crates"],
-        parameters["hoists"],
-        parameters["store_areas"],
-        parameters["depots"],
-    )
-    depots = min(depots, 36)
-    parameters["depots"] = depots
-    parameters["store_areas"] = store_areas + max(depots, hoists, crates)
-    parameters["containers"] = math.ceil(crates / 4)
-
-    return parameters
-
-
-def adapt_parameters_snake(parameters):
-    xgrid = int(parameters["x_grid"])
-    ygrid = int(parameters["y_grid"])
-
-    percentage = int(parameters["num_spawn_apples"][:-1]) / 100.0
-    parameters["board"] = f"empty-{xgrid}x{ygrid}"
-
-    if xgrid * ygrid * percentage < int(parameters["num_initial_apples"]):
-        parameters["num_initial_apples"] = int(xgrid * ygrid * percentage)
-
-    return parameters
 
 
 def adapt_parameters_tetris(parameters):
@@ -201,6 +154,19 @@ DOMAINS = [
             get_int("robots", lower=2, upper=10),
         ],
         adapt_parameters=adapt_parameters_floortile,
+    ),
+    Domain(
+        "grid",
+        "generate.py {x} {y} --shapes {shapes} --keys {keys} --locks {locks} --prob-goal {prob_key_in_goal} --seed {seed}",
+        [
+            get_int("x", lower=3, upper=100),
+            get_int("y", lower=3, upper=100),
+            get_float("prob_key_in_goal", lower=0.5, upper=1.0),
+            get_int("shapes", lower=1, upper=100),
+            get_int("extra_keys", lower=1, upper=100),
+            get_float("percentage_cells_locked", lower=0.1, upper=0.9),
+        ],
+        adapt_parameters=adapt_parameters_grid,
     ),
     Domain(
         "mystery",

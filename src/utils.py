@@ -8,6 +8,8 @@ def join_parameters(parameters: dict):
             value = value.strip("-")
             if not value:
                 value = "empty"
+        elif isinstance(value, float):
+            value = f"{value:.2}"
         return str(value)
     return "-".join(format_value(value) for _, value in sorted(parameters.items()))
 
