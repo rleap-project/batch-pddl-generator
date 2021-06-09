@@ -200,6 +200,8 @@ scenario = Scenario(
         "run_obj": "quality",
         # max. number of function evaluations
         "ta_run_limit": ARGS.max_configurations,
+        # maximum total runtime for function evaluations
+        "algo_runs_timelimit": ARGS.overall_time_limit,
         "wallclock_limit": ARGS.overall_time_limit,
         "cs": cs,
         "deterministic": ARGS.deterministic,
