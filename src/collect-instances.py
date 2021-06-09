@@ -12,13 +12,14 @@ import utils
 
 DIR = Path(__file__).resolve().parent
 REPO = DIR.parent
-RUNTIME_BOUNDS = [1, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
+RUNTIME_BOUNDS = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, float("inf")]
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("expdir", help="Experiment directory")
     parser.add_argument("destdir", help="Destination directory for benchmarks")
+    parser.add_argument("--max-tasks-per-runtime-block", type=int, default=float("inf"))
     return parser.parse_args()
 
 
@@ -40,13 +41,16 @@ def record_max_values(parameters, max_domain_values):
             max_domain_values[key] = value
 
 
-def record_runtime(domain_runtimes, runtime):
+def get_runtime_bound(runtime):
     for bound in RUNTIME_BOUNDS:
         if runtime <= bound:
-            if bound not in domain_runtimes:
-                domain_runtimes[bound] = 0
-            domain_runtimes[bound] += 1
-            break
+            return bound
+
+
+def record_runtime(domain_runtimes, bound):
+    if bound not in domain_runtimes:
+        domain_runtimes[bound] = 0
+    domain_runtimes[bound] += 1
 
 
 def print_max_values(max_values):
@@ -58,10 +62,10 @@ def print_max_values(max_values):
         print()
 
 
-def print_task_count(seen_hashes):
+def print_task_count(runtimes):
     print("\nTasks:")
-    for domain, hashes in sorted(seen_hashes.items()):
-        print(f" {domain}: {len(hashes)}")
+    for domain, domain_runtimes in sorted(runtimes.items()):
+        print(f" {domain}: {sum(domain_runtimes.values())}")
 
 
 def print_runtimes(runtimes):
@@ -103,7 +107,11 @@ def main():
         values["planner_runtime"] = runtime
         record_max_values(values, max_values[domain])
 
-        record_runtime(seen_runtimes[domain], runtime)
+        runtime_bound = get_runtime_bound(runtime)
+        if seen_runtimes[domain].get(runtime_bound, 0) >= args.max_tasks_per_runtime_block:
+            print("Skip task with overrepresented runtime")
+            continue
+        record_runtime(seen_runtimes[domain], runtime_bound)
 
         parameters = utils.join_parameters(props["parameters"])
         seed = props["seed"]
@@ -119,7 +127,7 @@ def main():
             print(f"Parameter order: {order}", file=f)
 
     print_max_values(max_values)
-    print_task_count(seen_task_hashes)
+    print_task_count(seen_runtimes)
     print_runtimes(seen_runtimes)
 
 
