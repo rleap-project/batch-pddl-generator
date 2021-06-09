@@ -12,6 +12,7 @@ import utils
 
 DIR = Path(__file__).resolve().parent
 REPO = DIR.parent
+RUNTIME_BOUNDS = [1, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000]
 
 
 def parse_args():
@@ -39,6 +40,15 @@ def record_max_values(parameters, max_domain_values):
             max_domain_values[key] = value
 
 
+def record_runtime(domain_runtimes, runtime):
+    for bound in RUNTIME_BOUNDS:
+        if runtime <= bound:
+            if bound not in domain_runtimes:
+                domain_runtimes[bound] = 0
+            domain_runtimes[bound] += 1
+            break
+
+
 def print_max_values(max_values):
     print("\nMax values:\n")
     for domain, max_values in sorted(max_values.items()):
@@ -54,6 +64,13 @@ def print_task_count(seen_hashes):
         print(f" {domain}: {len(hashes)}")
 
 
+def print_runtimes(runtimes):
+    print("\nRuntime smaller than:")
+    for domain, runtimes_dict in sorted(runtimes.items()):
+        runtimes = ", ".join(f"{k}s: {v}" for k, v in sorted(runtimes_dict.items()))
+        print(f" {domain}: {runtimes}")
+
+
 def main():
     args = parse_args()
     expdir = Path(args.expdir)
@@ -61,6 +78,7 @@ def main():
     plan_dirs = expdir.glob("runs-*-*/*/smac-*/run_*/plan/*/*/")
     max_values = defaultdict(dict)
     seen_task_hashes = defaultdict(set)
+    seen_runtimes = defaultdict(dict)
     for plan_dir in plan_dirs:
         try:
             with open(plan_dir / "properties.json") as f:
@@ -71,6 +89,7 @@ def main():
             continue
         print(f"Found {props}")
         domain = props["domain"]
+        runtime = props["runtime"]
 
         # Skip duplicate tasks.
         hash = hash_task(plan_dir)
@@ -81,8 +100,11 @@ def main():
             seen_task_hashes[domain].add(hash)
 
         values = props["parameters"].copy()
-        values["planner_runtime"] = props["runtime"]
+        values["planner_runtime"] = runtime
         record_max_values(values, max_values[domain])
+
+        record_runtime(seen_runtimes[domain], runtime)
+
         parameters = utils.join_parameters(props["parameters"])
         seed = props["seed"]
         problem_name = f"p-{parameters}-{seed}.pddl"
@@ -98,6 +120,7 @@ def main():
 
     print_max_values(max_values)
     print_task_count(seen_task_hashes)
+    print_runtimes(seen_runtimes)
 
 
 main()
