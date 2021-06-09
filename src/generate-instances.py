@@ -166,6 +166,7 @@ def store_results(cfg, seed, plan_dir, exitcode):
 def evaluate_configuration(cfg, seed=1):
     peak_memory = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
     cfg = cfg.get_dictionary()
+    cfg = DOMAIN.adapt_parameters(cfg)
     logging.info(f"[{peak_memory} KB] Evaluate configuration {cfg} with seed {seed}")
 
     try:

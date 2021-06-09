@@ -33,7 +33,7 @@ class Domain:
         self.name = name
         self.attributes = attributes
         self.command_template = generator_command
-        self.adapt_parameters = adapt_parameters
+        self._adapt_parameters = adapt_parameters
         attribute_names = {a.name for a in self.attributes}
         attribute_names_in_command = {
             fn
@@ -49,9 +49,12 @@ class Domain:
     def get_domain_file(self, generators_dir):
         return Path(generators_dir) / self.name / "domain.pddl"
 
+    def adapt_parameters(self, parameters):
+        if self._adapt_parameters:
+            parameters = self._adapt_parameters(parameters)
+        return parameters
+
     def get_generator_command(self, generators_dir, parameters, seed):
-        if self.adapt_parameters:
-            parameters = self.adapt_parameters(parameters)
         command = shlex.split(self.command_template.format(seed=seed, **parameters))
         command[0] = str((Path(generators_dir) / self.name / command[0]).resolve())
         # Call Python scripts with the correct Python interpreter.
@@ -163,6 +166,18 @@ Max parameter values after first optimization (2h):
   rows: 272/1000
 """
 DOMAINS = [
+    Domain(
+        "agricola",
+        "GenAgricola.py {stages} {seed} --num_workers {workers} {all_workers_flag}",
+        # Exclude --num_ints and --num_rounds {num_rounds} because they were not used in IPC'18.
+        [
+            get_int("stages", lower=3, upper=12),
+            get_int("workers", lower=3, upper=15),
+            get_enum(
+                "all_workers_flag", ["", "--must_create_workers"], default_value=""
+            ),
+        ],
+    ),
     Domain(
         "barman",
         "barman-generator.py {cocktails} {ingredients} {shots} {seed}",

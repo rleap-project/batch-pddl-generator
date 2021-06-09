@@ -3,7 +3,13 @@ import sys
 
 
 def join_parameters(parameters: dict):
-    return "-".join(str(value) for _, value in sorted(parameters.items()))
+    def format_value(value):
+        if isinstance(value, str):
+            value = value.strip("-")
+            if not value:
+                value = "none"
+        return str(value)
+    return "-".join(format_value(value) for _, value in sorted(parameters.items()))
 
 
 def setup_logging(debug):
