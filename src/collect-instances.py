@@ -48,6 +48,12 @@ def print_max_values(max_values):
         print()
 
 
+def print_task_count(seen_hashes):
+    print("\nTasks:")
+    for domain, hashes in sorted(seen_hashes.items()):
+        print(f" {domain}: {len(hashes)}")
+
+
 def main():
     args = parse_args()
     expdir = Path(args.expdir)
@@ -91,6 +97,7 @@ def main():
             print(f"Parameter order: {order}", file=f)
 
     print_max_values(max_values)
+    print_task_count(seen_task_hashes)
 
 
 main()

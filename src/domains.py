@@ -107,12 +107,20 @@ def adapt_parameters_tetris(parameters):
 """
 Max parameter values after first optimization (2h):
 
- mystery (limits=1000)
+ mystery (limits=1K)
   cargos: 244
   locations: 679
   maxfuel: 996
   maxspace: 964
   vehicles: 980
+
+ mystery (limits=100K)
+  cargos: 794
+  locations: 342
+  maxfuel: 9984
+  maxspace: 9968
+  planner_runtime: 8912.78
+  vehicles: 6943
 
  tetris
   block_type: 4
