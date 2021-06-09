@@ -312,6 +312,7 @@ def get_smac_experiment(domains, runs_per_domain, attributes, extra_options=None
                 "--planner-memory-limit", str(planner_memory_limit),
                 "--random-seed", str(seed),
                 "--generators-dir", generators_dir,
+                "--smac-output-dir", str(Path(exp.path) / f"smac-output-{domain}"),
                 domain] + extra_options
             run.add_command(
                 "generate",

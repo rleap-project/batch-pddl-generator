@@ -90,12 +90,19 @@ def parse_args():
         help="Path to directory containing the PDDL generators (default: %(default)s)",
     )
 
+    parser.add_argument(
+        "--smac-output-dir",
+        default="smac",
+        help="Directory where to store logs and temporary files (default: %(default)s)",
+    )
+
     return parser.parse_args()
 
 
 ARGS = parse_args()
 GENERATORS_DIR = Path(ARGS.generators_dir)
-OUTPUT_DIR = None  # Set after SMAC object is created.
+SMAC_OUTPUT_DIR = Path(ARGS.smac_output_dir)
+SMAC_RUN_DIR = None  # Set after SMAC object is created.
 random.seed(ARGS.random_seed)
 
 utils.setup_logging(ARGS.debug)
@@ -170,7 +177,7 @@ def evaluate_configuration(cfg, seed=1):
     logging.info(f"[{peak_memory} KB] Evaluate configuration {cfg} with seed {seed}")
 
     try:
-        plan_dir = RUNNER.generate_input_files(cfg, seed, OUTPUT_DIR)
+        plan_dir = RUNNER.generate_input_files(cfg, seed, SMAC_RUN_DIR)
     except domains.IllegalConfiguration as err:
         logging.info(f"Skipping illegal configuration {cfg}: {err}")
         return 100
@@ -209,12 +216,12 @@ scenario = Scenario(
         "memory_limit": None,
         # time limit for evaluate_cfg (we cut off planner runs ourselves)
         "cutoff": None,
-        "output_dir": f"smac-{ARGS.domain}",
+        "output_dir": f"{SMAC_OUTPUT_DIR}",
         # Disable pynisher.
         "limit_resources": False,
         # Run SMAC in parallel.
         "shared_model": True,
-        "input_psmac_dirs": "smac/run_*",
+        "input_psmac_dirs": f"{SMAC_OUTPUT_DIR}/run_*",
     }
 )
 
@@ -226,11 +233,11 @@ smac = SMAC4HPO(
     rng=np.random.RandomState(ARGS.random_seed),
     tae_runner=evaluate_configuration,
 )
-OUTPUT_DIR = smac.output_dir
-print("SMAC output dir:", OUTPUT_DIR)
+SMAC_RUN_DIR = smac.output_dir
+logging.info(f"SMAC run dir: {SMAC_RUN_DIR}")
 
 default_cfg = cs.get_default_configuration()
-print("Default config:", default_cfg)
+logging.info(f"Default config: {default_cfg}")
 
-print("Optimizing...")
+logging.info("Optimizing...")
 incumbent = smac.optimize()

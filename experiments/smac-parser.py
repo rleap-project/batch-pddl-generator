@@ -68,7 +68,7 @@ def parse_runtimes(content, props):
 
 def parse_shared_runs(content, props):
     values = re.findall(r"Shared model mode: Finished loading new runs, found (.+) new runs.", content)
-    props["shared_runs"] = sorted(collections.Counter(values).items())
+    props["max_shared_runs"] = max(int(val) for val in values) if values else -1
 
 
 def unsolvable(content, props):
@@ -97,7 +97,7 @@ parser.add_bottom_up_pattern('memory_baseline_runner', r'baseline runner memory:
 parser.add_bottom_up_pattern('memory_sart_runner', r'sart runner memory: (.+) KB', type=float)
 parser.add_function(error)
 parser.add_function(parse_runtimes)
-#parser.add_function(parse_shared_runs)
+parser.add_function(parse_shared_runs)
 parser.add_function(unsolvable)
 
 parser.parse()
