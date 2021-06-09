@@ -30,6 +30,8 @@ class Runner:
             self.generators_dir, parameters, seed
         )
         logging.debug("Generator command: {}".format(" ".join(command)))
+        with open(plan_dir / "generator-command.txt", "w") as f:
+            print(" ".join(command), file=f)
         self.domain.generate_problem(command, problem_file, domain_file)
 
         if not domain_file.is_file():
