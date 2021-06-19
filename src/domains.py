@@ -230,6 +230,40 @@ DOMAINS = [
         ],
         adapt_parameters=adapt_parameters_tetris,
     ),
+    # Schedule
+    #
+    # -p <num>    number of parts (minimal 1)
+    # -s <num>    number of shapes (preset: 0, maximal: 2)
+    # -c <num>    number of colors (preset: 2, minimal 1, maximal: 4)
+    # -w <num>    number of widths (preset: 2, minimal 1, maximal: 3)
+    # -o <num>    number of orientations (preset: 2, minimal 1, maximal: 2)
+    # -Q <num>    probability cylindrical goal (preset: 80)
+    # -W <num>    probability of colour in I (preset: 50)
+    # -E <num>    probability of colour in G (preset: 80)
+    # -R <num>    probability of hole in I (preset: 50)
+    # -T <num>    probability of hole in G (preset: 80)
+    # -Y <num>    probability of surface condition in G (preset: 50)
+    # -r <num>    random seed (minimal 1, optional)
+    Domain(
+        "schedule",
+        "./schedule "
+            "-p {parts} -s {shapes} -c {colors} -w {widths} -o {orientations} "
+            "-Q {prob_cylindrical_goal} -W {prob_color_init} -E {prob_color_goal} "
+            "-R {prob_hole_init} -T {prob_hole_goal} -Y {prob_surface_goal} -r {seed}",
+        [
+            get_int("parts", lower=1, upper=100),
+            get_int("shapes", lower=0, upper=2, log=False),
+            get_int("colors", lower=1, upper=4, log=False),
+            get_int("widths", lower=1, upper=3, log=False),
+            get_int("orientations", lower=1, upper=2, log=False),
+            get_int("prob_cylindrical_goal", lower=0, upper=100, log=False),
+            get_int("prob_color_init", lower=0, upper=100, log=False),
+            get_int("prob_color_goal", lower=0, upper=100, log=False),
+            get_int("prob_hole_init", lower=0, upper=100, log=False),
+            get_int("prob_hole_goal", lower=0, upper=100, log=False),
+            get_int("prob_surface_goal", lower=0, upper=100, log=False),
+        ],
+    ),
     Domain(
         "tpp",
         "tpp -s {seed} -m {markets} -p {products} -t {trucks} -d {depots} -l {goods} "
