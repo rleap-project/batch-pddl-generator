@@ -111,6 +111,8 @@ DOMAINS = domains.get_domains()
 logging.debug(f"{len(DOMAINS)} domains available: {sorted(DOMAINS)}")
 DOMAIN = DOMAINS[ARGS.domain]
 
+if not GENERATORS_DIR.exists():
+    sys.exit(f"Error: generators directory not found: {GENERATORS_DIR}")
 for domain in DOMAINS:
     if (
         not (GENERATORS_DIR / domain / "domain.pddl").is_file()
