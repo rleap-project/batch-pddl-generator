@@ -105,16 +105,24 @@ def adapt_parameters_tetris(parameters):
 
 
 """
-Max parameter values after first optimization (2h):
+Max parameter values:
 
- mystery (limits=1K)
+ agricola (5h)
+  planner_runtime: 17637.6
+  stages: 12 (3-12)
+  workers: 13 (3-15)
+
+  Runtime smaller than:
+   5s: 6, 10s: 507, 20s: 199, 50s: 446, 100s: 263, 200s: 236, 500s: 333, 1000s: 39, 2000s: 25, 5000s: 4, 10000s: 4, infs: 6
+
+ mystery (limits=1K, 2h)
   cargos: 244
   locations: 679
   maxfuel: 996
   maxspace: 964
   vehicles: 980
 
- mystery (limits=100K)
+ mystery (limits=100K, 5h)
   cargos: 794
   locations: 342
   maxfuel: 9984
@@ -125,9 +133,9 @@ Max parameter values after first optimization (2h):
   Runtime smaller than
    1s: 6697, 10s: 5867, 20s: 1327, 50s: 1700, 100s: 1259, 200s: 1085, 500s: 882, 1000s: 161, 2000s: 12, 5000s: 3, 10000s: 5
 
- tetris
+ tetris (5h)
   block_type: 4
-  rows: 272/1000
+  rows: 272 (4-1000)
 
   Runtime smaller than:
    1s: 3634, 2s: 1332, 5s: 1954, 10s: 625, 20s: 620, 50s: 463, 100s: 131, 200s: 49, 500s: 31, 1000s: 8, 2000s: 4, 5000s: 1
