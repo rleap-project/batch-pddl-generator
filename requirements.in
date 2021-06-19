@@ -1,0 +1,7 @@
+# After making changes here, update requirements.txt by running
+#
+# pip install pip-tools
+# pip-compile or python -m piptools compile
+
+lab==6.3
+smac==0.13.1
