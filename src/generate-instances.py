@@ -37,8 +37,8 @@ def parse_args():
     parser.add_argument("domain", help="Domain name")
     parser.add_argument(
         "planner",
-        help="Path to Singularity-based planner. "
-        "It must accept three parameters: domain_file problem_file plan_file",
+        help="Path to Singularity-based planner or path to sse.sif file. "
+        "Planners must accept three parameters: domain_file problem_file plan_file",
     )
 
     parser.add_argument(
@@ -123,9 +123,15 @@ for domain in DOMAINS:
 PLANNER = Path(ARGS.planner)
 if not PLANNER.is_file():
     sys.exit(f"planner not found: {PLANNER}")
+
+if PLANNER.name == "sse.sif":
+    COMMAND = ["bash", DIR / "run-sse.sh", PLANNER, "domain.pddl", "problem.pddl"]
+else:
+    COMMAND = ["bash", DIR / "run-singularity.sh", PLANNER, "domain.pddl", "problem.pddl", "sas_plan"]
+
 RUNNER = Runner(
     DOMAIN,
-    ["bash", DIR / "run-singularity.sh", PLANNER, "domain.pddl", "problem.pddl", "sas_plan"],
+    COMMAND,
     ARGS.planner_time_limit,
     ARGS.planner_memory_limit,
     GENERATORS_DIR,
@@ -146,7 +152,7 @@ def parse_runtime(plan_dir):
     with open(plan_dir / "run.log") as f:
         output = f.read()
     logging.debug(f"\n\nPlanner output:\n\n{output}\n\n")
-    match = re.search("Singularity runtime: (.+?)s", output)
+    match = re.search("runtime: (.+?)s real", output)
     runtime = float(match.group(1))
     runtime = max(0.1, runtime)  # log(0) is undefined.
     return runtime
