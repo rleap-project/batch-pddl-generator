@@ -11,6 +11,13 @@ import subprocess
 import sys
 import warnings
 
+import numpy as np
+
+from smac.configspace import ConfigurationSpace
+from smac.scenario.scenario import Scenario
+from smac.facade.smac_hpo_facade import SMAC4HPO
+from smac.initial_design.default_configuration_design import DefaultConfiguration
+
 import domains
 from runner import Runner
 import utils
@@ -20,21 +27,14 @@ warnings.simplefilter(action="ignore", category=FutureWarning)
 warnings.simplefilter(action="ignore", category=DeprecationWarning)
 
 
-import numpy as np
-
-from smac.configspace import ConfigurationSpace
-from smac.scenario.scenario import Scenario
-from smac.facade.smac_hpo_facade import SMAC4HPO
-from smac.initial_design.default_configuration_design import DefaultConfiguration
-
-
 DIR = Path(__file__).resolve().parent
 REPO = DIR.parent
+DOMAINS = domains.get_domains()
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("domain", help="Domain name")
+    parser.add_argument("domain", choices=DOMAINS, help="Domain name")
     parser.add_argument(
         "planner",
         help="Path to Singularity-based planner or path to sse.sif file. "
@@ -107,7 +107,6 @@ random.seed(ARGS.random_seed)
 
 utils.setup_logging(ARGS.debug)
 
-DOMAINS = domains.get_domains()
 logging.debug(f"{len(DOMAINS)} domains available: {sorted(DOMAINS)}")
 DOMAIN = DOMAINS[ARGS.domain]
 
