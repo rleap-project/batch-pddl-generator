@@ -15,6 +15,6 @@ export LANG=C
 
 /usr/bin/time -o /dev/stdout -f "SSE runtime: %es real, %Us user, %Ss sys" \
   "$SSE" \
-    --workspace /tmp/workspace \
+    --workspace "$(pwd)" \
     --domain "$DOMAIN" \
     --instance "$PROBLEM"
