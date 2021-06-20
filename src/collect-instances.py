@@ -20,6 +20,7 @@ def parse_args():
     parser.add_argument("expdir", help="Experiment directory")
     parser.add_argument("destdir", help="Destination directory for benchmarks")
     parser.add_argument("--max-tasks-per-runtime-block", type=int, default=float("inf"))
+    parser.add_argument("--logs", action="store_true", help="Copy the planner output to destdir")
     return parser.parse_args()
 
 
@@ -79,7 +80,8 @@ def main():
     args = parse_args()
     expdir = Path(args.expdir)
     destdir = Path(args.destdir)
-    plan_dirs = expdir.glob("runs-*-*/*/smac-*/run_*/plan/*/*/")
+    plan_dirs = list(expdir.glob("smac-output-*/run_*/plan/*/*/"))
+    print(f"Found {len(plan_dirs)} directories with planner runs")
     max_values = defaultdict(dict)
     seen_task_hashes = defaultdict(set)
     seen_runtimes = defaultdict(dict)
@@ -119,6 +121,8 @@ def main():
         target_dir = destdir / domain
         target_dir.mkdir(parents=True, exist_ok=True)
         shutil.copy2(plan_dir / "problem.pddl", target_dir / problem_name)
+        if args.logs:
+            shutil.copy2(plan_dir / "run.log", target_dir / f"p-{parameters}-{seed}.log")
 
         # Write domain file and information about parameters.
         shutil.copy2(plan_dir / "domain.pddl", target_dir)
