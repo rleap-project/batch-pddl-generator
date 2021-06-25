@@ -17,4 +17,5 @@ export LANG=C
   "$SSE" \
     --workspace "$(pwd)" \
     --domain "$DOMAIN" \
-    --instance "$PROBLEM"
+    --instance "$PROBLEM" \
+    --options "ignore_non_fringe_dead_states=0"
