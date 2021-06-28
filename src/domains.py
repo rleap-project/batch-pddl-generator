@@ -160,7 +160,8 @@ DOMAINS = [
             get_int("cocktails", lower=1, upper=10),
             get_int("shots", lower=1, upper=5),
             get_int("ingredients", lower=2, upper=6),
-        ], adapt_parameters=adapt_parameters_barman,
+        ],
+        adapt_parameters=adapt_parameters_barman,
     ),
     Domain(
         "blocksworld",
@@ -222,6 +223,15 @@ DOMAINS = [
         ],
     ),
     Domain(
+        "pathways",
+        f"wrapper.py --seed {{seed}} --reactions {{reactions}} --goals {{goals}} --initial-substances {{substances}} {TMP_DOMAIN} {TMP_PROBLEM}",
+        [
+            get_int("reactions", lower=1, upper=10000),
+            get_int("goals", lower=1, upper=1000),
+            get_int("substances", lower=2, upper=1000),
+        ],
+    ),
+    Domain(
         "tetris",
         "generator.py {rows} {block_type}",
         [
@@ -247,9 +257,9 @@ DOMAINS = [
     Domain(
         "schedule",
         "./schedule "
-            "-p {parts} -s {shapes} -c {colors} -w {widths} -o {orientations} "
-            "-Q {prob_cylindrical_goal} -W {prob_color_init} -E {prob_color_goal} "
-            "-R {prob_hole_init} -T {prob_hole_goal} -Y {prob_surface_goal} -r {seed}",
+        "-p {parts} -s {shapes} -c {colors} -w {widths} -o {orientations} "
+        "-Q {prob_cylindrical_goal} -W {prob_color_init} -E {prob_color_goal} "
+        "-R {prob_hole_init} -T {prob_hole_goal} -Y {prob_surface_goal} -r {seed}",
         [
             get_int("parts", lower=1, upper=100),
             get_int("shapes", lower=0, upper=2, log=False),
