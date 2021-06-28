@@ -285,7 +285,7 @@ class SmacReport(AbsoluteReport):
         "node", "wallclock_time"]
 
 
-def get_smac_experiment(domains, runs_per_domain, attributes, extra_options=None):
+def get_smac_experiment(domains_and_planners, runs_per_domain, attributes, extra_options=None):
     extra_options = extra_options or []
     if REMOTE:
         environment = BaselSlurmEnvironment(
@@ -306,7 +306,8 @@ def get_smac_experiment(domains, runs_per_domain, attributes, extra_options=None
     planner_memory_limit = 5 * 1024
     generators_dir = os.environ["PDDL_GENERATORS"]
 
-    for domain in domains:
+    for domain, planner in domains_and_planners:
+        planner = get_singularity_planner(planner)
         for seed in range(runs_per_domain):
             run = exp.add_run()
             cmd = [sys.executable, str(DIR.parent / "src" / "generate-instances.py"),
@@ -316,7 +317,7 @@ def get_smac_experiment(domains, runs_per_domain, attributes, extra_options=None
                 "--random-seed", str(seed),
                 "--generators-dir", generators_dir,
                 "--smac-output-dir", str(Path(exp.path) / f"smac-output-{domain}"),
-                domain] + extra_options
+                domain, planner] + extra_options
             run.add_command(
                 "generate",
                 cmd,
