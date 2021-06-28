@@ -157,16 +157,15 @@ def parse_runtime(plan_dir):
     return runtime
 
 
-def store_results(cfg, seed, plan_dir, exitcode):
+def store_results(cfg, seed, plan_dir, exitcode, runtime):
     # Save results in JSON file.
     results = {
         "domain": ARGS.domain,
         "parameters": cfg,
         "seed": int(seed),
         "planner_exitcode": exitcode,
+        "runtime": runtime,
     }
-    if exitcode == 0:
-        results["runtime"] = parse_runtime(plan_dir)
     with open(plan_dir / "properties.json", "w") as props:
         json.dump(
             results,
@@ -196,10 +195,11 @@ def evaluate_configuration(cfg, seed=1):
         return 100
 
     exitcode = RUNNER.run_planner(plan_dir)
-    store_results(cfg, seed, plan_dir, exitcode)
+    runtime = parse_runtime(plan_dir) if exitcode == 0 else None
+    store_results(cfg, seed, plan_dir, exitcode, runtime)
     show_error_log(plan_dir)
     if exitcode == 0:
-        logging.info(f"Solved task {cfg}")
+        logging.info(f"Solved task {cfg} in {runtime}s")
     else:
         logging.info(f"Failed to solve task {cfg}")
         return 100
