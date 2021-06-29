@@ -12,8 +12,8 @@ ATTRIBUTES = [
     "error", "run_dir", "final_*", "smac_exit_code",
     "max_shared_runs",
 ]
-SMAC_RUNS_PER_DOMAIN = 50
-EXTRA_OPTIONS = []
+SMAC_RUNS_PER_DOMAIN = 10
+EXTRA_OPTIONS = ["--deterministic"]
 
 DOMAINS_AND_PLANNERS = [
     ("agricola", "fd1906-lama-first.img"),
