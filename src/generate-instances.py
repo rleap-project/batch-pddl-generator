@@ -15,7 +15,7 @@ import numpy as np
 
 from smac.configspace import ConfigurationSpace
 from smac.scenario.scenario import Scenario
-from smac.facade.smac_hpo_facade import SMAC4HPO
+from smac.facade.smac_hpo_facade import SMAC4AC as SMAC
 from smac.initial_design.default_configuration_design import DefaultConfiguration
 
 import domains
@@ -237,7 +237,7 @@ scenario = Scenario(
 
 # When using SMAC4HPO, the default configuration has to be requested explicitly
 # as first design (see https://github.com/automl/SMAC3/issues/533).
-smac = SMAC4HPO(
+smac = SMAC(
     scenario=scenario,
     initial_design=DefaultConfiguration,
     rng=np.random.RandomState(ARGS.random_seed),
