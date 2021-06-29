@@ -139,6 +139,47 @@ Max parameter values:
 
   Runtime smaller than:
    1s: 3634, 2s: 1332, 5s: 1954, 10s: 625, 20s: 620, 50s: 463, 100s: 131, 200s: 49, 500s: 31, 1000s: 8, 2000s: 4, 5000s: 1
+
+
+Hard tasks (SMAC4HPO):
+
+agricola
+  all_workers_flag: --must_create_workers
+  planner_runtime: 16734.25
+  stages: 12
+  workers: 13
+
+ mystery
+  cargos: 235
+  locations: 34
+  maxfuel: 5975
+  maxspace: 9551
+  planner_runtime: 4688.43
+  vehicles: 7
+
+ pathways
+  goals: 981
+  planner_runtime: 1397.82
+  reactions: 9800
+  substances: 998
+
+ tetris
+  block_type: 4
+  planner_runtime: 2049.34
+  rows: 14
+
+
+Tasks:
+ agricola: 6610
+ mystery: 8584
+ pathways: 49470
+ tetris: 1695
+
+Runtime smaller than:
+ agricola: 5s: 46, 10s: 146, 20s: 1448, 50s: 3131, 100s: 606, 200s: 637, 500s: 499, 1000s: 52, 2000s: 25, 5000s: 4, 10000s: 9, infs: 7
+ mystery: 1s: 559, 2s: 706, 5s: 997, 10s: 342, 20s: 708, 50s: 342, 100s: 1222, 200s: 1420, 500s: 1562, 1000s: 665, 2000s: 59, 5000s: 2
+ pathways: 1s: 891, 2s: 5000, 5s: 16102, 10s: 12278, 20s: 9984, 50s: 2177, 100s: 64, 200s: 2891, 500s: 82, 2000s: 1
+ tetris: 1s: 324, 2s: 103, 5s: 339, 10s: 369, 20s: 209, 50s: 192, 100s: 103, 200s: 41, 500s: 11, 1000s: 2, 2000s: 1, 5000s: 1
 """
 DOMAINS = [
     Domain(
@@ -146,8 +187,8 @@ DOMAINS = [
         "GenAgricola.py {stages} {seed} --num_workers {workers} {all_workers_flag}",
         # Exclude --num_ints and --num_rounds {num_rounds} because they were not used in IPC'18.
         [
-            get_int("stages", lower=3, upper=12),
-            get_int("workers", lower=3, upper=15),
+            get_int("stages", lower=3, upper=20),
+            get_int("workers", lower=3, upper=20),
             get_enum(
                 "all_workers_flag", ["", "--must_create_workers"], default_value=""
             ),
@@ -226,9 +267,9 @@ DOMAINS = [
         "pathways",
         f"wrapper.py --seed {{seed}} --reactions {{reactions}} --goals {{goals}} --initial-substances {{substances}} {TMP_DOMAIN} {TMP_PROBLEM}",
         [
-            get_int("reactions", lower=1, upper=10000),
-            get_int("goals", lower=1, upper=1000),
-            get_int("substances", lower=2, upper=1000),
+            get_int("reactions", lower=1, upper=10 ** 6),
+            get_int("goals", lower=1, upper=10 ** 5),
+            get_int("substances", lower=2, upper=10** 5),
         ],
     ),
     Domain(
