@@ -4,4 +4,4 @@
 # pip-compile or python -m piptools compile
 
 lab==6.3
-smac==0.13.1
+smac==0.12.3

@@ -4,28 +4,12 @@
 #
 #    pip-compile
 #
-click==8.0.1
-    # via distributed
-cloudpickle==1.6.0
-    # via
-    #   dask
-    #   distributed
 configspace==0.4.19
     # via smac
 cycler==0.10.0
     # via matplotlib
 cython==0.29.23
     # via configspace
-dask==2021.05.0
-    # via
-    #   distributed
-    #   smac
-distributed==2021.5.0
-    # via smac
-fsspec==2021.5.0
-    # via dask
-heapdict==1.0.1
-    # via zict
 joblib==1.0.1
     # via
     #   scikit-learn
@@ -36,12 +20,8 @@ lab==6.3
     # via -r requirements.in
 lazy-import==0.2.2
     # via smac
-locket==0.2.1
-    # via partd
 matplotlib==3.4.2
     # via lab
-msgpack==1.0.2
-    # via distributed
 numpy==1.20.3
     # via
     #   configspace
@@ -49,13 +29,10 @@ numpy==1.20.3
     #   scikit-learn
     #   scipy
     #   smac
-partd==1.2.0
-    # via dask
 pillow==8.2.0
     # via matplotlib
 psutil==5.8.0
     # via
-    #   distributed
     #   pynisher
     #   smac
 pynisher==0.6.4
@@ -68,10 +45,6 @@ pyrfr==0.8.2
     # via smac
 python-dateutil==2.8.1
     # via matplotlib
-pyyaml==5.4.1
-    # via
-    #   dask
-    #   distributed
 scikit-learn==0.24.2
     # via smac
 scipy==1.6.3
@@ -85,25 +58,12 @@ six==1.16.0
     #   cycler
     #   lazy-import
     #   python-dateutil
-smac==0.13.1
+smac==0.12.3
     # via -r requirements.in
-sortedcontainers==2.4.0
-    # via distributed
-tblib==1.7.0
-    # via distributed
 threadpoolctl==2.1.0
     # via scikit-learn
-toolz==0.11.1
-    # via
-    #   dask
-    #   distributed
-    #   partd
-tornado==6.1
-    # via distributed
 txt2tags==3.7
     # via lab
-zict==2.0.0
-    # via distributed
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools
