@@ -7,6 +7,7 @@ import json
 from pathlib import Path
 import shutil
 
+import domains
 import utils
 
 
@@ -124,8 +125,13 @@ def main():
         if args.logs:
             shutil.copy2(plan_dir / "run.log", target_dir / f"p-{parameters}-{seed}.log")
 
-        # Write domain file and information about parameters.
-        shutil.copy2(plan_dir / "domain.pddl", target_dir)
+        # Copy domain file.
+        output_domain_filename = "domain.pddl"
+        if domains.get_domains()[domain].uses_per_instance_domain_file():
+            output_domain_filename = f"domain-p-{parameters}-{seed}.pddl"
+        shutil.copy2(plan_dir / "domain.pddl", target_dir / output_domain_filename)
+
+        # Write information about parameters.
         order = ", ".join(str(k) for k in sorted(props["parameters"]))
         with open(target_dir / "README", "w") as f:
             print(f"Parameter order: {order}", file=f)
