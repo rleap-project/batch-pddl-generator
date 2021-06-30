@@ -5,6 +5,7 @@ from collections import defaultdict
 import hashlib
 import json
 from pathlib import Path
+import random
 import shutil
 
 import domains
@@ -13,7 +14,7 @@ import utils
 
 DIR = Path(__file__).resolve().parent
 REPO = DIR.parent
-RUNTIME_BOUNDS = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, float("inf")]
+RUNTIME_BOUNDS = [1, 2, 5, 10, 20, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000, 50000, float("inf")]
 
 
 def parse_args():
@@ -65,7 +66,7 @@ def print_max_values(max_values):
 
 
 def print_task_count(runtimes):
-    print("\nTasks:")
+    print("Tasks:")
     for domain, domain_runtimes in sorted(runtimes.items()):
         print(f" {domain}: {sum(domain_runtimes.values())}")
 
@@ -83,6 +84,8 @@ def main():
     destdir = Path(args.destdir)
     plan_dirs = list(expdir.glob("smac-output-*/run_*/plan/*/*/"))
     print(f"Found {len(plan_dirs)} directories with planner runs")
+    # Avoid bias when selecting instances.
+    random.shuffle(plan_dirs)
     max_values = defaultdict(dict)
     seen_task_hashes = defaultdict(set)
     seen_runtimes = defaultdict(dict)

@@ -168,7 +168,6 @@ agricola
   planner_runtime: 2049.34
   rows: 14
 
-
 Tasks:
  agricola: 6610
  mystery: 8584
@@ -180,6 +179,48 @@ Runtime smaller than:
  mystery: 1s: 559, 2s: 706, 5s: 997, 10s: 342, 20s: 708, 50s: 342, 100s: 1222, 200s: 1420, 500s: 1562, 1000s: 665, 2000s: 59, 5000s: 2
  pathways: 1s: 891, 2s: 5000, 5s: 16102, 10s: 12278, 20s: 9984, 50s: 2177, 100s: 64, 200s: 2891, 500s: 82, 2000s: 1
  tetris: 1s: 324, 2s: 103, 5s: 339, 10s: 369, 20s: 209, 50s: 192, 100s: 103, 200s: 41, 500s: 11, 1000s: 2, 2000s: 1, 5000s: 1
+
+
+Hard Tasks (SMAC4AC, deterministic, fewer parallel runs)
+
+Max values:
+
+ agricola
+  all_workers_flag: --must_create_workers
+  planner_runtime: 10333.44
+  stages: 12
+  workers: 13
+
+ mystery
+  cargos: 336
+  locations: 168
+  maxfuel: 9977
+  maxspace: 5121
+  planner_runtime: 6385.7
+  vehicles: 1102
+
+ pathways
+  goals: 8653
+  planner_runtime: 9076.46
+  reactions: 916910
+  substances: 2264
+
+ tetris
+  block_type: 4
+  planner_runtime: 1603.09
+  rows: 138
+
+Tasks:
+ agricola: 67
+ mystery: 492
+ pathways: 114
+ tetris: 42
+
+Runtime smaller than:
+ agricola: 5s: 2, 10s: 7, 20s: 13, 50s: 14, 100s: 11, 200s: 9, 500s: 7, 2000s: 1, 10000s: 2, infs: 1
+ mystery: 1s: 16, 2s: 8, 5s: 14, 10s: 14, 20s: 6, 50s: 23, 100s: 35, 200s: 34, 500s: 182, 1000s: 159, 10000s: 1
+ pathways: 1s: 17, 2s: 7, 5s: 10, 10s: 5, 20s: 6, 50s: 5, 100s: 2, 200s: 6, 500s: 9, 1000s: 2, 2000s: 2, 5000s: 29, 10000s: 14
+ tetris: 1s: 5, 2s: 8, 5s: 3, 10s: 4, 20s: 4, 50s: 6, 100s: 4, 200s: 3, 500s: 2, 1000s: 2, 2000s: 1
 """
 DOMAINS = [
     Domain(
