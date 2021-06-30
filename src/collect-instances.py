@@ -23,6 +23,7 @@ def parse_args():
     parser.add_argument("destdir", help="Destination directory for benchmarks")
     parser.add_argument("--max-tasks-per-runtime-block", type=int, default=float("inf"))
     parser.add_argument("--logs", action="store_true", help="Copy the planner output to destdir")
+    parser.add_argument("--min-runtime", type=float, default=0., help="Minimum planner runtime")
     return parser.parse_args()
 
 
@@ -108,6 +109,10 @@ def main():
             continue
         else:
             seen_task_hashes[domain].add(hash)
+
+        if runtime < args.min_runtime:
+            print(f"Skip easy task with runtime {runtime}")
+            continue
 
         values = props["parameters"].copy()
         values["planner_runtime"] = runtime
