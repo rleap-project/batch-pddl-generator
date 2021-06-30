@@ -102,6 +102,10 @@ def main():
         domain = props["domain"]
         runtime = props["runtime"]
 
+        if runtime < args.min_runtime:
+            print(f"Skip easy task with runtime {runtime}")
+            continue
+
         # Skip duplicate tasks.
         hash = hash_task(plan_dir)
         if hash in seen_task_hashes[domain]:
@@ -109,10 +113,6 @@ def main():
             continue
         else:
             seen_task_hashes[domain].add(hash)
-
-        if runtime < args.min_runtime:
-            print(f"Skip easy task with runtime {runtime}")
-            continue
 
         values = props["parameters"].copy()
         values["planner_runtime"] = runtime
