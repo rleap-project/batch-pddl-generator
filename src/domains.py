@@ -360,14 +360,14 @@ DOMAINS = [
     ),
     Domain(
         "tidybot",
-        "gentidy.py {worldsize} {tables} {cupboards} {mintablesize} {maxtablesize} 4 {seed}",
+        "gentidy.py {worldsize} {tables} {cupboards} {mintablesize} {maxtablesize} {cupboardsize} {seed}",
         [
             get_int("worldsize", lower=5, upper=15, step_size=1),  # IPC 2011: 5-9 (opt), 9-12 (sat)
             get_int("tables", lower=0, upper=10, step_size=2),  # IPC 2011: 0-5 (opt), 2-9 (sat)
             get_int("cupboards", lower=1, upper=3),  # IPC 2011: 1 (opt), 1-3 (sat)
             get_int("mintablesize", lower=1, upper=5, step_size=2),  # IPC 2011: ? (opt), ? (sat)
             get_int("maxtablesize", lower=1, upper=5, step_size=2),  # IPC 2011: ? (opt), ? (sat)
-            #get_int("cupboardsize", lower=4, upper=4),  # IPC 2011: ? (opt), ? (sat), 4 (README)
+            get_int("cupboardsize", lower=4, upper=5),  # IPC 2011: ? (opt), ? (sat), 4 (README)
         ],
         adapt_parameters=adapt_parameters_tidybot,
     ),
