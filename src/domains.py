@@ -83,6 +83,12 @@ def adapt_parameters_floortile(parameters):
     return parameters
 
 
+def adapt_parameters_freecell(parameters):
+    if parameters["initial_stacks"] > parameters["columns"]:
+        raise IllegalConfiguration("we need initial_stacks <= columns")
+    return parameters
+
+
 def adapt_parameters_grid(parameters):
     parameters["shapes"] = min(
         parameters["x"] * parameters["y"] - 1, parameters["shapes"]
@@ -285,6 +291,19 @@ DOMAINS = [
             get_int("robots", lower=2, upper=10),
         ],
         adapt_parameters=adapt_parameters_floortile,
+    ),
+    Domain(
+        "freecell",
+        "freecell -f {cells} -c {columns} -s 4 -0 {suite_size} -1 {suite_size} "
+        "-2 {suite_size} -3 {suite_size} -i {initial_stacks} -r {seed}",
+        [
+            get_int("cells", lower=0, upper=4),
+            get_int("columns", lower=1, upper=8),
+            #get_int("suits", lower=4, upper=4),  # hardcoded as in IPC tasks
+            get_int("suite_size", lower=2, upper=13),  # as in IPC tasks
+            get_int("initial_stacks", lower=1, upper=8),
+        ],
+        adapt_parameters=adapt_parameters_freecell,
     ),
     Domain(
         "grid",
