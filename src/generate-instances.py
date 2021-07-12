@@ -103,6 +103,7 @@ ARGS = parse_args()
 GENERATORS_DIR = Path(ARGS.generators_dir)
 SMAC_OUTPUT_DIR = Path(ARGS.smac_output_dir)
 SMAC_RUN_DIR = None  # Set after SMAC object is created.
+TMP_PLAN_DIR = "plan"
 random.seed(ARGS.random_seed)
 
 utils.setup_logging(ARGS.debug)
@@ -189,7 +190,8 @@ def evaluate_configuration(cfg, seed=1):
     logging.info(f"[{peak_memory} KB] Evaluate configuration {cfg} with seed {seed}")
 
     try:
-        plan_dir = RUNNER.generate_input_files(cfg, seed, SMAC_RUN_DIR)
+        plan_dir = utils.generate_input_files(
+            GENERATORS_DIR, DOMAIN, cfg, seed, SMAC_RUN_DIR / TMP_PLAN_DIR)
     except subprocess.CalledProcessError as err:
         logging.error(f"Failed to generate task {cfg}: {err}")
         return 100
@@ -243,7 +245,7 @@ smac = SMAC(
     rng=np.random.RandomState(ARGS.random_seed),
     tae_runner=evaluate_configuration,
 )
-SMAC_RUN_DIR = smac.output_dir
+SMAC_RUN_DIR = Path(smac.output_dir)
 logging.info(f"SMAC run dir: {SMAC_RUN_DIR}")
 
 default_cfg = cs.get_default_configuration()

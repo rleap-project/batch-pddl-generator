@@ -17,9 +17,9 @@ class IllegalConfiguration(Exception):
     pass
 
 
-def get_int(name, lower, upper, *, log=True):
+def get_int(name, lower, upper, *, log=False, step_size=1):
     return UniformIntegerHyperparameter(
-        name, lower=lower, upper=upper, default_value=lower, log=log
+        name, lower=lower, upper=upper, default_value=lower, log=log, q=step_size
     )
 
 
@@ -56,14 +56,14 @@ class Domain:
             command.insert(0, sys.executable)
         return command
 
-    def generate_problem(self, command, problem_file, domain_file):
+    def generate_problem(self, command, problem_file, domain_file, timeout=None):
         # Some generators print to a file, others print to stdout.
         if TMP_PROBLEM in self.command_template:
-            subprocess.run(command, check=True)
+            subprocess.run(command, check=True, timeout=timeout)
             shutil.move(TMP_PROBLEM, problem_file)
         else:
             with open(problem_file, "w") as f:
-                subprocess.run(command, stdout=f, check=True)
+                subprocess.run(command, stdout=f, check=True, timeout=timeout)
 
         if self.uses_per_instance_domain_file():
             shutil.move(TMP_DOMAIN, domain_file)
@@ -315,9 +315,9 @@ DOMAINS = [
     ),
     Domain(
         "tetris",
-        "generator.py {rows} {block_type}",
+        "generator.py {rows} {block_type} {seed}",
         [
-            get_int("rows", lower=4, upper=1000),
+            get_int("rows", lower=4, upper=50),
             get_enum("block_type", ["1", "2", "3", "4"], "1"),
         ],
         adapt_parameters=adapt_parameters_tetris,
