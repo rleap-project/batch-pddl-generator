@@ -27,8 +27,8 @@ def generate_input_files(generators_dir, domain, parameters, seed, output_dir, t
     return plan_dir
 
 
-def collect_task(domain, cfg_string, seed, srcdir, destdir, copy_logs=False):
-    cfg_string = join_parameters(cfg_string)
+def collect_task(domain, cfg, seed, srcdir, destdir, copy_logs=False):
+    cfg_string = join_parameters(cfg)
     problem_name = f"p-{cfg_string}-{seed}.pddl"
     target_dir = destdir / domain.name
     target_dir.mkdir(parents=True, exist_ok=True)

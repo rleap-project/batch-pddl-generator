@@ -24,6 +24,7 @@ def parse_args():
     parser.add_argument("domain", choices=DOMAINS, help="Domain name")
     parser.add_argument("destdir", help="Destination directory for benchmarks")
     parser.add_argument("--debug", action="store_true", help="Print debug info")
+    parser.add_argument("--generator-time-limit", default=None, type=int, help="Time limit for generator calls")
 
     parser.add_argument(
         "--num-random-seeds",
@@ -41,7 +42,7 @@ def parse_args():
     return parser.parse_args()
 
 
-def generate_task(generators_dir, domain, cfg, seed, tmp_dir, output_dir):
+def generate_task(generators_dir, domain, cfg, seed, tmp_dir, output_dir, time_limit=None):
     try:
         cfg = domain.adapt_parameters(cfg)
     except domains.IllegalConfiguration as err:
@@ -50,10 +51,10 @@ def generate_task(generators_dir, domain, cfg, seed, tmp_dir, output_dir):
 
     logging.info(f"Create instance for configuration {cfg} with seed {seed}")
     try:
-        plan_dir = utils.generate_input_files(generators_dir, domain, cfg, seed, tmp_dir, timeout=1)
+        plan_dir = utils.generate_input_files(generators_dir, domain, cfg, seed, tmp_dir, timeout=time_limit)
     except subprocess.CalledProcessError as err:
         logging.error(f"Failed to generate task: {err}")
-        raise
+        return
     except subprocess.TimeoutExpired as err:
         logging.error(f"Failed to generate task: {err}")
         return
@@ -80,7 +81,9 @@ def main():
     for cfg in grid:
         cfg = cfg.get_dictionary()
         for seed in range(args.num_random_seeds):
-            generate_task(generators_dir, domain, cfg, seed, tmp_dir, destdir)
+            generate_task(
+                generators_dir, domain, cfg, seed, tmp_dir, destdir,
+                time_limit=args.generator_time_limit)
     shutil.rmtree(tmp_dir, ignore_errors=False)
 
 

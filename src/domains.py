@@ -297,10 +297,10 @@ DOMAINS = [
         "freecell -f {cells} -c {columns} -s 4 -0 {suite_size} -1 {suite_size} "
         "-2 {suite_size} -3 {suite_size} -i {initial_stacks} -r {seed}",
         [
-            get_int("cells", lower=0, upper=4),
-            get_int("columns", lower=1, upper=8),
+            get_int("cells", lower=2, upper=4),
+            get_int("columns", lower=3, upper=8),
             #get_int("suits", lower=4, upper=4),  # hardcoded as in IPC tasks
-            get_int("suite_size", lower=2, upper=13),  # as in IPC tasks
+            get_int("suite_size", lower=2, upper=20),
             get_int("initial_stacks", lower=1, upper=8),
         ],
         adapt_parameters=adapt_parameters_freecell,
@@ -319,14 +319,25 @@ DOMAINS = [
         adapt_parameters=adapt_parameters_grid,
     ),
     Domain(
+        "mprime",
+        "mprime -l {locations} -f {maxfuel} -s {maxspace} -v {vehicles} -c {cargos} -r {seed}",
+        [
+            get_int("locations", lower=5, upper=25, step_size=5),
+            get_int("maxfuel", lower=10, upper=15, step_size=5),
+            get_int("maxspace", lower=2, upper=4, step_size=2),
+            get_int("vehicles", lower=2, upper=16, step_size=2),
+            get_int("cargos", lower=5, upper=50, step_size=5),
+        ],
+    ),
+    Domain(
         "mystery",
         "mystery -l {locations} -f {maxfuel} -s {maxspace} -v {vehicles} -c {cargos} -r {seed}",
         [
-            get_int("locations", lower=2, upper=10 ** 5),
-            get_int("maxfuel", lower=1, upper=10 ** 5),
-            get_int("maxspace", lower=1, upper=10 ** 5),
-            get_int("vehicles", lower=1, upper=10 ** 5),
-            get_int("cargos", lower=1, upper=10 ** 5),
+            get_int("locations", lower=5, upper=25, step_size=5),
+            get_int("maxfuel", lower=10, upper=15, step_size=5),
+            get_int("maxspace", lower=2, upper=4, step_size=2),
+            get_int("vehicles", lower=2, upper=16, step_size=2),
+            get_int("cargos", lower=5, upper=50, step_size=5),
         ],
     ),
     Domain(
@@ -349,14 +360,14 @@ DOMAINS = [
     ),
     Domain(
         "tidybot",
-        "gentidy.py {worldsize} {tables} {cupboards} {mintablesize} {maxtablesize} {cupboardsize} {seed}",
+        "gentidy.py {worldsize} {tables} {cupboards} {mintablesize} {maxtablesize} 4 {seed}",
         [
-            get_int("worldsize", lower=2, upper=100),
-            get_int("tables", lower=1, upper=100),
-            get_int("cupboards", lower=1, upper=100),
-            get_int("mintablesize", lower=1, upper=100),
-            get_int("maxtablesize", lower=1, upper=100),
-            get_int("cupboardsize", lower=1, upper=100),
+            get_int("worldsize", lower=5, upper=15, step_size=1),  # IPC 2011: 5-9 (opt), 9-12 (sat)
+            get_int("tables", lower=0, upper=10, step_size=2),  # IPC 2011: 0-5 (opt), 2-9 (sat)
+            get_int("cupboards", lower=1, upper=3),  # IPC 2011: 1 (opt), 1-3 (sat)
+            get_int("mintablesize", lower=1, upper=5, step_size=2),  # IPC 2011: ? (opt), ? (sat)
+            get_int("maxtablesize", lower=1, upper=5, step_size=2),  # IPC 2011: ? (opt), ? (sat)
+            #get_int("cupboardsize", lower=4, upper=4),  # IPC 2011: ? (opt), ? (sat), 4 (README)
         ],
         adapt_parameters=adapt_parameters_tidybot,
     ),
