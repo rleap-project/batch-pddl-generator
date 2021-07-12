@@ -111,14 +111,7 @@ utils.setup_logging(ARGS.debug)
 logging.debug(f"{len(DOMAINS)} domains available: {sorted(DOMAINS)}")
 DOMAIN = DOMAINS[ARGS.domain]
 
-if not GENERATORS_DIR.exists():
-    sys.exit(f"Error: generators directory not found: {GENERATORS_DIR}")
-for domain in DOMAINS:
-    if (
-        not (GENERATORS_DIR / domain / "domain.pddl").is_file()
-        and not DOMAINS[domain].uses_per_instance_domain_file()
-    ):
-        sys.exit(f"Error: domain.pddl missing for {domain}")
+utils.check_generators_dir(GENERATORS_DIR, DOMAINS)
 
 PLANNER = Path(ARGS.planner)
 if not PLANNER.is_file():

@@ -104,6 +104,12 @@ def adapt_parameters_tetris(parameters):
     return parameters
 
 
+def adapt_parameters_tidybot(parameters):
+    if parameters["mintablesize"] > parameters["maxtablesize"]:
+        raise IllegalConfiguration("mintablesize must be <= maxtablesize")
+    return parameters
+
+
 """
 Max parameter values:
 
@@ -321,6 +327,19 @@ DOMAINS = [
             get_enum("block_type", ["1", "2", "3", "4"], "1"),
         ],
         adapt_parameters=adapt_parameters_tetris,
+    ),
+    Domain(
+        "tidybot",
+        "gentidy.py {worldsize} {tables} {cupboards} {mintablesize} {maxtablesize} {cupboardsize} {seed}",
+        [
+            get_int("worldsize", lower=2, upper=100),
+            get_int("tables", lower=1, upper=100),
+            get_int("cupboards", lower=1, upper=100),
+            get_int("mintablesize", lower=1, upper=100),
+            get_int("maxtablesize", lower=1, upper=100),
+            get_int("cupboardsize", lower=1, upper=100),
+        ],
+        adapt_parameters=adapt_parameters_tidybot,
     ),
     # Schedule
     #
