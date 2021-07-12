@@ -99,7 +99,7 @@ def main():
         if props["planner_exitcode"] != 0:
             continue
         print(f"Found {props}")
-        domain = props["domain"]
+        domain_name = props["domain"]
         runtime = props["runtime"]
 
         if runtime < args.min_runtime:
@@ -108,41 +108,25 @@ def main():
 
         # Skip duplicate tasks.
         hash = hash_task(plan_dir)
-        if hash in seen_task_hashes[domain]:
+        if hash in seen_task_hashes[domain_name]:
             print("Skip duplicate task")
             continue
         else:
-            seen_task_hashes[domain].add(hash)
+            seen_task_hashes[domain_name].add(hash)
 
         values = props["parameters"].copy()
         values["planner_runtime"] = runtime
-        record_max_values(values, max_values[domain])
+        record_max_values(values, max_values[domain_name])
 
         runtime_bound = get_runtime_bound(runtime)
-        if seen_runtimes[domain].get(runtime_bound, 0) >= args.max_tasks_per_runtime_block:
+        if seen_runtimes[domain_name].get(runtime_bound, 0) >= args.max_tasks_per_runtime_block:
             print("Skip task with overrepresented runtime")
             continue
-        record_runtime(seen_runtimes[domain], runtime_bound)
+        record_runtime(seen_runtimes[domain_name], runtime_bound)
 
-        parameters = utils.join_parameters(props["parameters"])
-        seed = props["seed"]
-        problem_name = f"p-{parameters}-{seed}.pddl"
-        target_dir = destdir / domain
-        target_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(plan_dir / "problem.pddl", target_dir / problem_name)
-        if args.logs:
-            shutil.copy2(plan_dir / "run.log", target_dir / f"p-{parameters}-{seed}.log")
-
-        # Copy domain file.
-        output_domain_filename = "domain.pddl"
-        if domains.get_domains()[domain].uses_per_instance_domain_file():
-            output_domain_filename = f"domain-p-{parameters}-{seed}.pddl"
-        shutil.copy2(plan_dir / "domain.pddl", target_dir / output_domain_filename)
-
-        # Write information about parameters.
-        order = ", ".join(str(k) for k in sorted(props["parameters"]))
-        with open(target_dir / "README", "w") as f:
-            print(f"Parameter order: {order}", file=f)
+        domain = domains.get_domains()[domain_name]
+        utils.collect_task(
+            domain, props["parameters"], props["seed"], srcdir=plan_dir, destdir=destdir, copy_logs=args.logs)
 
     print_max_values(max_values)
     print_task_count(seen_runtimes)
