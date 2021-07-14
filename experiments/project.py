@@ -290,7 +290,7 @@ def get_smac_experiment(domains_and_planners, runs_per_domain, attributes, extra
     if REMOTE:
         environment = BaselSlurmEnvironment(
             email=USER.email,
-            partition="infai_2",
+            partition="infai_1",
             memory_per_cpu="6354M")
     else:
         environment = LocalEnvironment(processes=2)
