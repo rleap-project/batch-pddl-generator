@@ -344,9 +344,14 @@ DOMAINS = [
         "pathways",
         f"wrapper.py --seed {{seed}} --reactions {{reactions}} --goals {{goals}} --initial-substances {{substances}} {TMP_DOMAIN} {TMP_PROBLEM}",
         [
-            get_int("reactions", lower=1, upper=10 ** 6),
-            get_int("goals", lower=1, upper=10 ** 5),
-            get_int("substances", lower=2, upper=10** 5),
+            # optimal planning
+            #get_int("reactions", lower=1, upper=101, step_size=5),  # IPC: 12-480
+            #get_int("goals", lower=1, upper=31, step_size=3),  # IPC: 1-40
+            #get_int("substances", lower=1, upper=22, step_size=3),  # IPC: 3-35
+            # satisficing planning
+            get_int("reactions", lower=10, upper=1010, step_size=50),  # IPC: 12-480
+            get_int("goals", lower=10, upper=90, step_size=10),  # IPC: 1-40
+            get_int("substances", lower=10, upper=80, step_size=10),  # IPC: 3-35
         ],
     ),
     Domain(
