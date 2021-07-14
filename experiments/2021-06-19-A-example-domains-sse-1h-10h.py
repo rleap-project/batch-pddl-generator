@@ -17,11 +17,13 @@ ATTRIBUTES = [
 ]
 SMAC_RUNS_PER_DOMAIN = 10
 PLANNER = project.get_singularity_planner("sse.sif")
-EXTRA_OPTIONS = [str(PLANNER)]
+EXTRA_OPTIONS = []
 
 if not project.REMOTE:
     SMAC_RUNS_PER_DOMAIN = 1
     EXTRA_OPTIONS += ["--max-configurations", "1"]
 
-exp = project.get_smac_experiment(DOMAINS, SMAC_RUNS_PER_DOMAIN, ATTRIBUTES, EXTRA_OPTIONS)
+domains_and_planners = [(domain, str(PLANNER)) for domain in DOMAINS]
+
+exp = project.get_smac_experiment(domains_and_planners, SMAC_RUNS_PER_DOMAIN, ATTRIBUTES, EXTRA_OPTIONS)
 exp.run_steps()
