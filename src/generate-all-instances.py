@@ -24,6 +24,7 @@ def parse_args():
     parser.add_argument("domain", choices=DOMAINS, help="Domain name")
     parser.add_argument("destdir", help="Destination directory for benchmarks")
     parser.add_argument("--debug", action="store_true", help="Print debug info")
+    parser.add_argument("--dry-run", action="store_true", help="Show only size of configuration space")
     parser.add_argument("--generator-time-limit", default=None, type=int, help="Time limit for generator calls")
 
     parser.add_argument(
@@ -78,6 +79,8 @@ def main():
 
     grid = generate_grid(cs)
     print(f"Number of configurations: {len(grid)}")
+    if args.dry_run:
+        return
     for cfg in grid:
         cfg = cfg.get_dictionary()
         for seed in range(args.num_random_seeds):
