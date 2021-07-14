@@ -4,11 +4,11 @@ Classes and functions for running paper experiments with Fast Downward.
 
 from collections import defaultdict, namedtuple
 import getpass
+import logging
 import os
 import os.path
 from pathlib import Path
 import platform
-import re
 import shutil
 import subprocess
 import sys
