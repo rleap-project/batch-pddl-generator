@@ -83,19 +83,17 @@ def main():
     args = parse_args()
     expdir = Path(args.expdir)
     destdir = Path(args.destdir)
-    plan_dirs = list(expdir.glob("smac-output-*/run_*/plan/*/*/"))
-    print(f"Found {len(plan_dirs)} directories with planner runs")
+    properties_files = list(expdir.glob("smac-output-*/run_*/plan/*/*/properties.json"))
+    print(f"Found {len(properties_files)} properties files")
     # Avoid bias when selecting instances.
-    random.shuffle(plan_dirs)
+    random.shuffle(properties_files)
     max_values = defaultdict(dict)
     seen_task_hashes = defaultdict(set)
     seen_runtimes = defaultdict(dict)
-    for plan_dir in plan_dirs:
-        try:
-            with open(plan_dir / "properties.json") as f:
-                props = json.load(f)
-        except FileNotFoundError:
-            continue
+    for properties_file in properties_files:
+        plan_dir = properties_file.parent
+        with open(properties_file) as f:
+            props = json.load(f)
         if props["planner_exitcode"] != 0:
             continue
         print(f"Found {props}")
