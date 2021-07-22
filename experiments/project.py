@@ -295,9 +295,8 @@ class SmacReport(AbsoluteReport):
 def get_smac_experiment(domains_and_planners, runs_per_domain, attributes, extra_options=None):
     extra_options = extra_options or []
     if REMOTE:
-        environment = BaselSlurmEnvironment(
-            email=USER.email,
-            partition="infai_1",
+        environment = TetralithEnvironment(
+            email="jendrik.seipp@liu.se",
             memory_per_cpu="6354M")
     else:
         environment = LocalEnvironment(processes=2)
