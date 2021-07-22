@@ -9,13 +9,14 @@ import os
 import os.path
 from pathlib import Path
 import platform
+import re
 import shutil
 import subprocess
 import sys
 
 import parse
 
-from lab.environments import LocalEnvironment, BaselSlurmEnvironment
+from lab.environments import LocalEnvironment, BaselSlurmEnvironment, TetralithEnvironment
 from lab.experiment import Experiment, ARGPARSER
 from lab.reports import Attribute, geometric_mean
 from lab.reports.filter import FilterReport
@@ -32,33 +33,29 @@ DIR = Path(__file__).resolve().parent
 REPO = DIR.parent
 IMAGES_DIR = REPO / "images"
 NODE = platform.node()
-REMOTE = NODE.endswith((".scicore.unibas.ch", ".cluster.bc2.ch"))
+REMOTE = re.match(r"tetralith\d+\.nsc\.liu\.se|n\d+", NODE)
 
-User = namedtuple("User", ["email", "scp_login", "remote_user", "repos"])
-
+User = namedtuple("User", ["scp_login", "remote_repos"])
 USERS = {
     "jendrik": User(
-        email=None,
-        scp_login="seipp@login-infai.scicore.unibas.ch",
-        remote_user="seipp",
-        repos="/home/jendrik/projects/Downward"),
-    "seipp": User(
-        email="jendrik.seipp@unibas.ch",
-        scp_login=None,
-        remote_user=None,
-        repos="/infai/seipp/projects"),
+        scp_login="nsc",
+        remote_repos="/proj/dfsplan/users/x_jense/",
+    ),
 }
-LOGIN = getpass.getuser()
-USER = USERS[LOGIN]
-REMOTE_USER = USERS.get(USER.remote_user)
+USER = USERS.get(getpass.getuser())
 
-ARGPARSER.add_argument("--tex", action="store_true", help="produce tex output")
-ARGPARSER.add_argument("--relative", action="store_true", help="produce relative scatter plot")
-ARGPARSER.add_argument("--test", action="store_true", help="test experiment locally", default=not REMOTE)
-args = ARGPARSER.parse_args()
-TEX = args.tex
-RELATIVE = args.relative
-TEST = args.test
+
+def parse_args():
+    ARGPARSER.add_argument("--tex", action="store_true", help="produce LaTeX output")
+    ARGPARSER.add_argument(
+        "--relative", action="store_true", help="make relative scatter plots"
+    )
+    return ARGPARSER.parse_args()
+
+
+ARGS = parse_args()
+TEX = ARGS.tex
+RELATIVE = ARGS.relative
 
 EVALUATIONS_PER_TIME = Attribute(
     "evaluations_per_time", min_wins=False, function=geometric_mean, digits=1)
@@ -142,18 +139,19 @@ def get_rel_experiment_dir():
     return os.path.join(repo_name, project, "data", expname)
 
 
-def get_repo_base():
+
+def get_repo_base() -> Path:
     """Get base directory of the repository, as an absolute path.
 
     Search upwards in the directory tree from the main script until a
-    directory with a subdirectory named ".hg" is found.
+    directory with a subdirectory named ".git" or ".hg" is found.
 
     Abort if the repo base cannot be found."""
-    path = os.path.abspath(tools.get_script_path())
-    while os.path.dirname(path) != path:
-        if any(os.path.exists(os.path.join(path, x)) for x in [".git", ".hg"]):
+    path = Path(tools.get_script_path())
+    while path.parent != path:
+        if any((path / d).is_dir() for d in [".git", ".hg"]):
             return path
-        path = os.path.dirname(path)
+        path = path.parent
     sys.exit("repo base could not be found")
 
 
@@ -216,19 +214,28 @@ def remove_file(filename):
         pass
 
 
-def add_scp_steps(exp):
-    if not REMOTE:
-        exp.add_step(
-            'remove-eval-dir', shutil.rmtree, exp.eval_dir,
-            ignore_errors=True)
+def _get_exp_dir_relative_to_repo():
+    repo_name = get_repo_base().name
+    script = Path(tools.get_script_path())
+    script_dir = script.parent
+    rel_script_dir = script_dir.relative_to(get_repo_base())
+    expname = script.stem
+    return repo_name / rel_script_dir / "data" / expname
 
-        remote_exp = os.path.join(
-            REMOTE_USER.repos, get_rel_experiment_dir())
-        exp.add_step('scp-eval-dir', subprocess.call, [
-            'scp',
-            '-Cr',  # Compress files.
-            '%s:%s-eval' % (USER.scp_login, remote_exp),
-            '%s-eval' % exp.path])
+
+def add_scp_step(exp):
+    remote_exp = Path(USER.remote_repos) / _get_exp_dir_relative_to_repo()
+    exp.add_step(
+        "scp-eval-dir",
+        subprocess.call,
+        [
+            "scp",
+            "-r",  # Copy recursively.
+            "-C",  # Compress files.
+            f"{USER.scp_login}:{remote_exp}-eval",
+            f"{exp.path}-eval",
+        ],
+    )
 
 
 def fetch_algorithm(exp, expname, algo, new_algo=None):
@@ -340,7 +347,11 @@ def get_smac_experiment(domains_and_planners, runs_per_domain, attributes, extra
     exp.add_step("start", exp.start_runs)
     exp.add_fetcher(name="fetch")
 
-    add_scp_steps(exp)
+    if not REMOTE:
+        exp.add_step(
+            'remove-eval-dir', shutil.rmtree, exp.eval_dir,
+            ignore_errors=True)
+        add_scp_step(exp)
 
     report = Path(exp.eval_dir) / f"{exp.name}.html"
     exp.add_report(
