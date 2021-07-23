@@ -34,7 +34,10 @@ def collect_task(domain, cfg, seed, srcdir, destdir, copy_logs=False):
     target_dir.mkdir(parents=True, exist_ok=True)
     shutil.copy2(srcdir / "problem.pddl", target_dir / problem_name)
     if copy_logs:
-        shutil.copy2(srcdir / "run.log", target_dir / f"p-{cfg_string}-{seed}.log")
+        try:
+            shutil.copy2(srcdir / "run.log", target_dir / f"p-{cfg_string}-{seed}.log")
+        except FileNotFoundError:
+            shutil.copy2(srcdir / "run.log.xz", target_dir / f"p-{cfg_string}-{seed}.log.xz")
 
     # Copy domain file.
     output_domain_filename = "domain.pddl"

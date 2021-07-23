@@ -193,6 +193,7 @@ def evaluate_configuration(cfg, seed=1):
     runtime = parse_runtime(plan_dir) if exitcode == 0 else None
     store_results(cfg, seed, plan_dir, exitcode, runtime)
     show_error_log(plan_dir)
+    subprocess.run(["xz", "run.log"], cwd=plan_dir)
     if runtime is not None:
         logging.info(f"Solved task {cfg} in {runtime}s")
         # Maximize runtime.
