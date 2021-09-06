@@ -29,7 +29,9 @@ def get_float(name, lower, upper, *, log=False, precision=0.01):
     )
 
 
-def get_enum(name, choices, default_value):
+def get_enum(name, choices, default_value=None):
+    if default_value is None:
+        default_value = choices[0]
     return CategoricalHyperparameter(name, choices, default_value=default_value)
 
 
@@ -324,11 +326,16 @@ DOMAINS = [
         [
             # optimal planning (ranges from IPC renamed domain version):
             #   for file in `ls prob*.pddl`; do grep location $file | wc -l; done | sort -n | uniq | paste -s -d,
-            get_int("locations", lower=4, upper=22, step_size=1),  # 4,5,6,7,8,10,11,12,13,15,16,17,18,19,21,22
-            get_int("maxfuel", lower=10, upper=15, step_size=5),  # 3,4,5,6,7,8,9,10,11,12,13
-            get_int("maxspace", lower=1, upper=3, step_size=1),  # 1,2,3
-            get_int("vehicles", lower=1, upper=16, step_size=1),  # 1,2,3,4,5,6,7,8,9,11,16
-            get_int("cargos", lower=2, upper=46, step_size=1),  # 2,3,4,5,6,7,8,9,10,11,13,14,15,16,18,20,22,24,34,37,39,40,44,46
+            #get_int("locations", lower=4, upper=22, step_size=1),  # 4,5,6,7,8,10,11,12,13,15,16,17,18,19,21,22
+            #get_int("maxfuel", lower=3, upper=13, step_size=1),  # 3,4,5,6,7,8,9,10,11,12,13
+            #get_int("maxspace", lower=1, upper=3, step_size=1),  # 1,2,3
+            #get_int("vehicles", lower=1, upper=16, step_size=1),  # 1,2,3,4,5,6,7,8,9,11,16
+            #get_int("cargos", lower=2, upper=46, step_size=1),  # 2,3,4,5,6,7,8,9,10,11,13,14,15,16,18,20,22,24,34,37,39,40,44,46
+            get_enum("locations", [3,4,5,6,8,10]),
+            get_enum("maxfuel", [3,4,5,6,8,10]),
+            get_enum("maxspace", [1,2,3]),
+            get_enum("vehicles", [1,2,3,4,6,8]),
+            get_enum("cargos", [1,2,3,4,5,6,8,10,12]),
             # satisficing planning
             #get_int("locations", lower=5, upper=25, step_size=5),
             #get_int("maxfuel", lower=10, upper=15, step_size=5),
