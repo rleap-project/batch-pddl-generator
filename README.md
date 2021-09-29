@@ -1,6 +1,6 @@
-# Simple instance generator (SIG)
+# Batch PDDL Generator (BPG)
 
-Specify PDDL generator parameters and their value ranges and let SIG generate
+Specify PDDL generator parameters and their value ranges and let BPG generate
 PDDL tasks for you.
 
 
