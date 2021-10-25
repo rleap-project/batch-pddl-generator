@@ -3,6 +3,6 @@
 # pip install pip-tools
 # pip-compile or python -m piptools compile
 
-lab==6.5
-parse
+lab==6.4
+parse==1.19.0
 smac==0.12.3

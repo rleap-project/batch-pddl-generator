@@ -92,17 +92,9 @@ def adapt_parameters_freecell(parameters):
 
 
 def adapt_parameters_grid(parameters):
-    parameters["shapes"] = min(
-        parameters["x"] * parameters["y"] - 1, parameters["shapes"]
-    )
-    parameters["keys"] = min(
-        parameters["x"] * parameters["y"] - 1,
-        parameters["shapes"] + parameters["extra_keys"],
-    )
-    parameters["locks"] = int(
-        parameters["x"] * parameters["y"] * parameters["percentage_cells_locked"]
-    )
-    parameters["locks"] = max(parameters["locks"], parameters["shapes"])
+    if len(parameters["keys"]) != parameters["shapes"]:
+        raise IllegalConfiguration("number of shapes does not fit the given vector of keys and locks")
+    parameters["locks"] = parameters["keys"]
     return parameters
 
 
@@ -115,6 +107,12 @@ def adapt_parameters_tetris(parameters):
 def adapt_parameters_tidybot(parameters):
     if parameters["mintablesize"] > parameters["maxtablesize"]:
         raise IllegalConfiguration("mintablesize must be <= maxtablesize")
+    return parameters
+
+
+def adapt_parameters_spanner(parameters):
+    if parameters["num_nuts"] > parameters["num_spanners"]:
+        raise IllegalConfiguration("num_nuts must be <= num_spanners")
     return parameters
 
 
@@ -226,8 +224,7 @@ Max values:
 
 Tasks:
  agricola: 67
- mystery: 492
- pathways: 114
+ mystery: 492gnum_keytypes
  tetris: 42
 
 Runtime smaller than:
@@ -253,35 +250,46 @@ DOMAINS = [
         "barman",
         "barman-generator.py {cocktails} {ingredients} {shots} {seed}",
         [
-            get_int("cocktails", lower=1, upper=10),
-            get_int("shots", lower=1, upper=5),
-            get_int("ingredients", lower=2, upper=6),
+            get_int("cocktails", lower=1, upper=2),
+            get_int("shots", lower=1, upper=2),
+            get_int("ingredients", lower=2, upper=3),
         ],
         adapt_parameters=adapt_parameters_barman,
     ),
     Domain(
         "blocksworld",
-        "blocksworld 4 {n} {seed}",
-        [get_int("n", lower=2, upper=100)],
+        "blocksworld 4 {n}",
+        [
+            get_enum("n", choices=[3]),
+        ],  # training
+        # [get_int("n", lower=10, upper=20)],  # testing
     ),
     Domain(
         "childsnack",
         "child-snack-generator.py pool {seed} {children} {trays} {gluten_factor} {constrainedness}",
         [
-            get_int("children", lower=2, upper=100),
-            get_float("constrainedness", lower=1.0, upper=2.0),
-            get_int("trays", lower=2, upper=4),
-            get_float("gluten_factor", lower=0.4, upper=0.8),
+            get_int("children", lower=2, upper=5),            
+            get_int("trays", lower=1, upper=2),
+            get_float("gluten_factor", lower=0., upper=1., precision=0.5),
+            get_enum("constrainedness", choices=[1.0]),
         ],
     ),
     Domain(
         "driverlog",
         "dlgen {seed} {roadjunctions} {drivers} {packages} {trucks}",
+        # training
+        #[
+        #    get_int("drivers", lower=1, upper=2),
+        #    get_int("packages", lower=1, upper=2),
+        #    get_int("roadjunctions", lower=2, upper=3),
+        #    get_int("trucks", lower=1, upper=2),
+        #],
+        # testing
         [
-            get_int("drivers", lower=1, upper=100),
-            get_int("packages", lower=1, upper=100),
-            get_int("roadjunctions", lower=2, upper=100),
-            get_int("trucks", lower=1, upper=100),
+            get_int("drivers", lower=4, upper=5),
+            get_int("packages", lower=4, upper=5),
+            get_int("roadjunctions", lower=4, upper=5),
+            get_int("trucks", lower=4, upper=5),
         ],
     ),
     Domain(
@@ -309,14 +317,13 @@ DOMAINS = [
     ),
     Domain(
         "grid",
-        "generate.py {x} {y} --shapes {shapes} --keys {keys} --locks {locks} --prob-goal {prob_key_in_goal} --seed {seed}",
+        "./grid -x {x} -y {y} -t {shapes} -k {keys} -l {locks} -p {prob_key_in_goal} -s {seed}",
         [
-            get_int("x", lower=3, upper=100),
-            get_int("y", lower=3, upper=100),
-            get_float("prob_key_in_goal", lower=0.5, upper=1.0),
-            get_int("shapes", lower=1, upper=100),
-            get_int("extra_keys", lower=1, upper=100),
-            get_float("percentage_cells_locked", lower=0.1, upper=0.9),
+            get_int("x", lower=2, upper=3),
+            get_int("y", lower=2, upper=3),
+            get_int("shapes", lower=1, upper=2),
+            get_enum("keys", choices=["0", "1", "2", "20", "02", "11"]),
+            get_enum("prob_key_in_goal", choices=[100]),
         ],
         adapt_parameters=adapt_parameters_grid,
     ),
@@ -412,17 +419,17 @@ DOMAINS = [
         "-Q {prob_cylindrical_goal} -W {prob_color_init} -E {prob_color_goal} "
         "-R {prob_hole_init} -T {prob_hole_goal} -Y {prob_surface_goal} -r {seed}",
         [
-            get_int("parts", lower=1, upper=100),
+            get_int("parts", lower=1, upper=2, log=False),
             get_int("shapes", lower=0, upper=2, log=False),
-            get_int("colors", lower=1, upper=4, log=False),
-            get_int("widths", lower=1, upper=3, log=False),
+            get_int("colors", lower=1, upper=2, log=False),
+            get_int("widths", lower=1, upper=2, log=False),
             get_int("orientations", lower=1, upper=2, log=False),
-            get_int("prob_cylindrical_goal", lower=0, upper=100, log=False),
-            get_int("prob_color_init", lower=0, upper=100, log=False),
-            get_int("prob_color_goal", lower=0, upper=100, log=False),
-            get_int("prob_hole_init", lower=0, upper=100, log=False),
-            get_int("prob_hole_goal", lower=0, upper=100, log=False),
-            get_int("prob_surface_goal", lower=0, upper=100, log=False),
+            get_enum("prob_cylindrical_goal", choices=[100]),
+            get_enum("prob_color_init", choices=[100]),
+            get_enum("prob_color_goal", choices=[100]),
+            get_enum("prob_hole_init", choices=[100]),
+            get_enum("prob_hole_goal", choices=[100]),
+            get_enum("prob_surface_goal", choices=[100]),
         ],
     ),
     Domain(
@@ -430,13 +437,55 @@ DOMAINS = [
         "tpp -s {seed} -m {markets} -p {products} -t {trucks} -d {depots} -l {goods} "
         + TMP_PROBLEM,
         [
-            get_int("products", lower=2, upper=20),
-            get_int("markets", lower=1, upper=10),
-            get_int("trucks", lower=2, upper=10),
-            get_int("depots", lower=1, upper=10),
-            get_int("goods", lower=3, upper=10),
+            get_int("products", lower=1, upper=2),
+            get_int("markets", lower=1, upper=2),
+            get_int("trucks", lower=1, upper=2),
+            get_int("depots", lower=1, upper=2),
+            get_int("goods", lower=1, upper=2),
         ],
     ),
+    Domain(
+        "spanner",
+        "spanner-generator.py "
+        "{num_spanners} {num_nuts} {num_locations}",
+        [
+            get_int("num_spanners", lower=2, upper=4),
+            get_int("num_nuts", lower=2, upper=4),
+            get_int("num_locations", lower=1, upper=3)
+        ],
+        adapt_parameters=adapt_parameters_spanner,
+    ),
+    Domain(
+        "miconic-strips",
+        "miconic -f {num_floors} -p {num_passengers}",
+        [
+            get_int("num_floors", lower=2, upper=3),
+            get_int("num_passengers", lower=2, upper=3)
+        ]
+    ),
+    Domain(
+        "visitall",
+        "grid -n {size_square_grid} -r {ratio_cells_in_goal} -u {num_cells_unavailable} -s {seed}",
+        [
+            get_int("size_square_grid", lower=2, upper=3),
+            get_float("ratio_cells_in_goal", lower=0.5, upper=1.0, precision=0.5),
+            get_int("num_cells_unavailable", lower=1, upper=2),
+        ]
+    ),
+    Domain(
+        "gripper",
+        "gripper -n {num_objects}",
+        [
+            get_int("num_objects", lower=1, upper=5),
+        ]
+    ),
+    Domain(
+        "gripper_constants",
+        "gripper -n {num_objects}",
+        [
+            get_int("num_objects", lower=1, upper=5),
+        ]
+    )
 ]
 
 

@@ -5,6 +5,7 @@ import logging
 from pathlib import Path
 import shutil
 import subprocess
+import os
 
 import ConfigSpace
 from ConfigSpace.util import generate_grid
@@ -60,7 +61,7 @@ def generate_task(generators_dir, domain, cfg, seed, tmp_dir, output_dir, time_l
         logging.error(f"Failed to generate task: {err}")
         return
 
-    utils.collect_task(domain, cfg, seed, srcdir=plan_dir, destdir=output_dir, copy_logs=False)
+    return utils.collect_task(domain, cfg, seed, srcdir=plan_dir, destdir=output_dir, copy_logs=False)
 
 
 def main():
@@ -81,13 +82,15 @@ def main():
     print(f"Number of configurations: {len(grid)}")
     if args.dry_run:
         return
+    problem_names = []
     for cfg in grid:
         cfg = cfg.get_dictionary()
         for seed in range(args.num_random_seeds):
-            generate_task(
+            problem_names.append(generate_task(
                 generators_dir, domain, cfg, seed, tmp_dir, destdir,
-                time_limit=args.generator_time_limit)
+                time_limit=args.generator_time_limit))
     shutil.rmtree(tmp_dir, ignore_errors=False)
+    print([os.path.splitext(problem_name)[0] for problem_name in problem_names if problem_name is not None])
 
 
 main()

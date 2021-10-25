@@ -50,6 +50,8 @@ def collect_task(domain, cfg, seed, srcdir, destdir, copy_logs=False):
     with open(target_dir / "README", "w") as f:
         print(f"Parameter order: {order}", file=f)
 
+    return problem_name
+
 
 def join_parameters(parameters: dict):
     def format_value(value):
