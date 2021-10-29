@@ -321,11 +321,12 @@ DOMAINS = [
     ),
     Domain(
         "visitall",
-        "grid -n {size_square_grid} -r {ratio_cells_in_goal} -u {num_cells_unavailable} -s {seed}",
+        "grid -x {grid_width} -y {grid_height} -u {unavailable_cells} -r {ratio_goal_cells} -s {seed}",
         [
-            get_int("size_square_grid", lower=2, upper=3),
-            get_float("ratio_cells_in_goal", lower=0.5, upper=1.0, precision=0.5),
-            get_int("num_cells_unavailable", lower=1, upper=2),
+            get_int("grid_width", lower=2, upper=3),
+            get_int("grid_height", lower=2, upper=3),
+            get_enum("unavailable_cells", [0]),
+            get_float("ratio_goal_cells", lower=0.5, upper=1.0, precision=0.5),
         ]
     ),
 ]
