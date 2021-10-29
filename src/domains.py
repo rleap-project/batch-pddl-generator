@@ -319,6 +319,15 @@ DOMAINS = [
             get_int("goods", lower=3, upper=10),
         ],
     ),
+    Domain(
+        "visitall",
+        "grid -n {size_square_grid} -r {ratio_cells_in_goal} -u {num_cells_unavailable} -s {seed}",
+        [
+            get_int("size_square_grid", lower=2, upper=3),
+            get_float("ratio_cells_in_goal", lower=0.5, upper=1.0, precision=0.5),
+            get_int("num_cells_unavailable", lower=1, upper=2),
+        ]
+    ),
 ]
 
 
