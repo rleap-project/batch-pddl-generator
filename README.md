@@ -50,7 +50,7 @@ There are two ways in which this library can be used:
 2. Use SMAC to generate planning tasks that can be solved by a given planner
 within given resource limits.
 
-        ./generate-instances.py \
+        ./search-instances-for-planner.py \
             --generators-dir <path/to/generators> \
             --planner-time-limit 60 \
             tetris <path/to/singularity-planner.img>
