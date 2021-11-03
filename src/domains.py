@@ -106,6 +106,12 @@ def adapt_parameters_grid(parameters):
     return parameters
 
 
+def adapt_parameters_hiking(parameters):
+    if parameters["cars"] < parameters["couples"] + 1:
+        raise IllegalConfiguration("we need cars >= couples + 1")
+    return parameters
+
+
 def adapt_parameters_spanner(parameters):
     if parameters["spanners"] < parameters["nuts"]:
         raise IllegalConfiguration("we need spanners >= nuts")
@@ -156,29 +162,29 @@ DOMAINS = [
         "childsnack",
         "child-snack-generator.py pool {seed} {children} {trays} {gluten_factor} {constrainedness}",
         [
-            get_int("children", lower=2, upper=100),
-            get_float("constrainedness", lower=1.0, upper=2.0),
-            get_int("trays", lower=2, upper=4),
-            get_float("gluten_factor", lower=0.4, upper=0.8),
+            get_int("children", lower=2, upper=5),
+            get_float("constrainedness", lower=1.0, upper=2.0, precision=0.5),
+            get_int("trays", lower=1, upper=3),
+            get_float("gluten_factor", lower=0.2, upper=0.8, precision=0.2),
         ],
     ),
     Domain(
         "driverlog",
         "dlgen {seed} {roadjunctions} {drivers} {packages} {trucks}",
         [
-            get_int("drivers", lower=1, upper=100),
-            get_int("packages", lower=1, upper=100),
-            get_int("roadjunctions", lower=2, upper=100),
-            get_int("trucks", lower=1, upper=100),
+            get_int("drivers", lower=1, upper=3),
+            get_int("packages", lower=1, upper=3),
+            get_int("roadjunctions", lower=2, upper=6),
+            get_int("trucks", lower=1, upper=5),
         ],
     ),
     Domain(
         "floortile",
         "floortile-generator.py name {rows} {columns} {robots} seq {seed}",
         [
-            get_int("rows", lower=2, upper=10),
-            get_int("columns", lower=2, upper=10),
-            get_int("robots", lower=2, upper=10),
+            get_int("rows", lower=2, upper=6),
+            get_int("columns", lower=2, upper=6),
+            get_int("robots", lower=1, upper=6),
         ],
         adapt_parameters=adapt_parameters_floortile,
     ),
@@ -199,14 +205,24 @@ DOMAINS = [
         "grid",
         "generate.py {x} {y} --shapes {shapes} --keys {keys} --locks {locks} --prob-goal {prob_key_in_goal} --seed {seed}",
         [
-            get_int("x", lower=3, upper=100),
-            get_int("y", lower=3, upper=100),
-            get_float("prob_key_in_goal", lower=0.5, upper=1.0),
-            get_int("shapes", lower=1, upper=100),
-            get_int("extra_keys", lower=1, upper=100),
-            get_float("percentage_cells_locked", lower=0.1, upper=0.9),
+            get_int("x", lower=2, upper=5, step_size=1),
+            get_int("y", lower=2, upper=5, step_size=1),
+            get_float("prob_key_in_goal", lower=0.5, upper=1.0, precision=0.5),
+            get_int("shapes", lower=1, upper=2),
+            get_int("extra_keys", lower=1, upper=2),
+            get_float("percentage_cells_locked", lower=0.3, upper=0.9, precision=0.3),
         ],
         adapt_parameters=adapt_parameters_grid,
+    ),
+    Domain(
+        "hiking",
+        "generator.py {couples} {cars} {places} {seed}",
+        [
+            get_int("couples", lower=1, upper=5),
+            get_int("places", lower=2, upper=10),
+            get_int("cars", lower=1, upper=5),
+        ],
+        adapt_parameters=adapt_parameters_hiking,
     ),
     Domain(
         "mprime",
