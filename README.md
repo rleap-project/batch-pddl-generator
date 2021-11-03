@@ -37,7 +37,7 @@ There are two ways in which this library can be used:
 
     the command
 
-        /generate-all-instances.py \
+        /generate-instances.py \
             --generators-dir <path/to/generators> \
             tetris /tmp/tasks
 
