@@ -34,6 +34,10 @@ DOMAINS = domains.get_domains()
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "generators_dir",
+        help="Path to directory containing the PDDL generators",
+    )
     parser.add_argument("domain", choices=DOMAINS, help="Domain name")
     parser.add_argument(
         "planner",
@@ -82,12 +86,6 @@ def parse_args():
         "--deterministic",
         action="store_true",
         help="Run each parameter configuration only once (with seed 0).",
-    )
-
-    parser.add_argument(
-        "--generators-dir",
-        default=REPO / "pddl-generators",
-        help="Path to directory containing the PDDL generators (default: %(default)s)",
     )
 
     parser.add_argument(

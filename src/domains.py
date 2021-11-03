@@ -106,6 +106,12 @@ def adapt_parameters_grid(parameters):
     return parameters
 
 
+def adapt_parameters_spanner(parameters):
+    if parameters["spanners"] < parameters["nuts"]:
+        raise IllegalConfiguration("we need spanners >= nuts")
+    return parameters
+
+
 def adapt_parameters_tetris(parameters):
     if parameters["rows"] % 2 == 1:
         raise IllegalConfiguration("number of rows must be even")
@@ -306,6 +312,16 @@ DOMAINS = [
             get_int("prob_hole_goal", lower=0, upper=100, log=False),
             get_int("prob_surface_goal", lower=0, upper=100, log=False),
         ],
+    ),
+    Domain(
+        "spanner",
+        "spanner-generator.py --seed {seed} {spanners} {nuts} {locations}",
+        [
+            get_int("spanners", lower=1, upper=5),
+            get_int("nuts", lower=1, upper=5),
+            get_int("locations", lower=1, upper=10),
+        ],
+        adapt_parameters=adapt_parameters_spanner,
     ),
     Domain(
         "tpp",

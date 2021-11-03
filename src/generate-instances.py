@@ -21,6 +21,10 @@ TMPDIR_NAME = "tmp"
 
 def parse_args():
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "generators_dir",
+        help="Path to directory containing the PDDL generators",
+    )
     parser.add_argument("domain", choices=DOMAINS, help="Domain name")
     parser.add_argument("destdir", help="Destination directory for benchmarks")
     parser.add_argument("--debug", action="store_true", help="Print debug info")
@@ -32,12 +36,6 @@ def parse_args():
         type=int,
         default=1,
         help="Number of random seeds used for each parameter configuration (default: %(default)d)",
-    )
-
-    parser.add_argument(
-        "--generators-dir",
-        default=REPO / "pddl-generators",
-        help="Path to directory containing the PDDL generators (default: %(default)s)",
     )
 
     return parser.parse_args()
