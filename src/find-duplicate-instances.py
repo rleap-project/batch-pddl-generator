@@ -76,9 +76,9 @@ class Task:
 
 def get_equivalent_problems(tasks, hash_unparsed_files):
     equivalent_tasks = defaultdict(list)
-    for index, task in enumerate(tasks):
-        if index % 10 == 0:
-            print(f"Hashing task {index}")
+    for index, task in enumerate(tasks, start=1):
+        if index % 100 == 0:
+            print(f"Hashing task {index}/{len(tasks)}")
         if hash_unparsed_files:
             hash = hash_unparsed_task(task)
         else:
@@ -110,7 +110,7 @@ def print_duplicates(equivalence_partition):
     if to_delete:
         print(f"Delete the following {len(to_delete)} files to only keep the first task of each group:")
         cmd = []
-        for task in to_delete:
+        for task in sorted(to_delete):
             cmd.append(f"{task.problem_file}")
             if task.domain_file.name != "domain.pddl":
                 cmd.append(f"{task.domain_file.name}")
