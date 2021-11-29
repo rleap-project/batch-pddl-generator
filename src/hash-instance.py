@@ -27,7 +27,7 @@ def dump_task(task):
     # print(f"Domain: {task.domain_name}")
     # print(f"Task: {task.task_name}")
     # print(f"Requirements: {sorted(task.requirements.requirements)}")
-    print(f"Types: {sorted(repr(typ) for typ in task.types)}")
+    #print(f"Types: {sorted(repr(typ) for typ in task.types)}")
     print(f"Objects: {sorted(str(obj) for obj in task.objects)}")
     print("Predicates:")
     for pred in task.predicates:

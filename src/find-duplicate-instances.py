@@ -7,7 +7,7 @@ from collections import defaultdict
 import hashlib
 from pathlib import Path
 import shlex
-from subprocess import check_output
+import subprocess
 import sys
 
 
@@ -23,7 +23,7 @@ def hash_unparsed_task(task):
 
 
 def parse_pddl_and_hash_task(task):
-    return check_output(
+    return subprocess.check_output(
         [sys.executable, DIR / "hash-instance.py", str(task.domain_file), str(task.problem_file)],
         encoding="utf-8")
 
@@ -76,13 +76,22 @@ class Task:
 
 def get_equivalent_problems(tasks, hash_unparsed_files):
     equivalent_tasks = defaultdict(list)
-    for task in tasks:
+    for index, task in enumerate(tasks):
+        if index % 10 == 0:
+            print(f"Hashing task {index}")
         if hash_unparsed_files:
             hash = hash_unparsed_task(task)
         else:
             hash = parse_pddl_and_hash_task(task)
         equivalent_tasks[hash].append(task)
     return equivalent_tasks.values()
+
+
+def get_relative_path(path):
+    try:
+        return path.relative_to(Path.cwd())
+    except ValueError:
+        return path
 
 
 def print_duplicates(equivalence_partition):
@@ -92,11 +101,8 @@ def print_duplicates(equivalence_partition):
         if len(partition) > 1:
             to_delete.extend(sorted(partition)[1:])
             for task in sorted(partition):
-                try:
-                    relpath = task.problem_file.relative_to(Path.cwd())
-                except ValueError:
-                    relpath = task.problem_file
-                print(f"{relpath}")
+                domain_file = get_relative_path(task.domain_file) if task.domain_file.name != "domain.pddl" else ""
+                print(f"{get_relative_path(task.problem_file)} {domain_file}")
             print()
 
     if to_delete:
