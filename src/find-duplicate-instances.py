@@ -97,8 +97,10 @@ def get_relative_path(path):
 def print_duplicates(equivalence_partition):
     print("Duplicates:\n")
     to_delete = []
+    num_duplicate_groups = 0
     for partition in equivalence_partition:
         if len(partition) > 1:
+            num_duplicate_groups += 1
             to_delete.extend(sorted(partition)[1:])
             for task in sorted(partition):
                 domain_file = get_relative_path(task.domain_file) if task.domain_file.name != "domain.pddl" else ""
@@ -106,13 +108,16 @@ def print_duplicates(equivalence_partition):
             print()
 
     if to_delete:
-        print("Delete the following files to only keep the first task of each class:")
+        print(f"Delete the following {len(to_delete)} files to only keep the first task of each group:")
         cmd = []
         for task in to_delete:
             cmd.append(f"{task.problem_file}")
             if task.domain_file.name != "domain.pddl":
                 cmd.append(f"{task.domain_file.name}")
         print(shlex.join(cmd))
+        print()
+
+    print(f"Found {num_duplicate_groups} groups of duplicate tasks")
 
 
 def main():
