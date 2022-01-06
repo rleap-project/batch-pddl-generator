@@ -82,7 +82,11 @@ def get_equivalent_problems(tasks, hash_unparsed_files):
         if hash_unparsed_files:
             hash = hash_unparsed_task(task)
         else:
-            hash = parse_pddl_and_hash_task(task)
+            try:
+                hash = parse_pddl_and_hash_task(task)
+            except subprocess.CalledProcessError as err:
+                print(f"Task couldn't be parsed: {get_relative_path(task.problem_file)}")
+                continue
         equivalent_tasks[hash].append(task)
     return equivalent_tasks.values()
 
@@ -113,7 +117,7 @@ def print_duplicates(equivalence_partition):
         for task in sorted(to_delete):
             cmd.append(f"{task.problem_file}")
             if task.domain_file.name != "domain.pddl":
-                cmd.append(f"{task.domain_file.name}")
+                cmd.append(f"{task.domain_file}")
         print(shlex.join(cmd))
         print()
 
