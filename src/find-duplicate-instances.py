@@ -31,7 +31,7 @@ def parse_pddl_and_hash_task(task):
 def find_tasks(paths):
     for path in paths:
         path = Path(path)
-        if path.is_file() and path.suffix == ".pddl" and not "domain" in path.name:
+        if path.is_file() and path.suffix == ".pddl" and "domain" not in path.name:
             yield Task(path)
         elif path.is_dir():
             yield from find_tasks(list(path.iterdir()))
@@ -134,7 +134,7 @@ def main():
     parser.add_argument(
         "--raw",
         action="store_true",
-        help="compare tasks based on the MD5 hash of the unparsed file contents",
+        help="compare tasks based on the MD5 hash of the unparsed file contents (this is faster but less accurate)",
     )
     args = parser.parse_args()
 

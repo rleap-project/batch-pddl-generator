@@ -54,3 +54,9 @@ within given resource limits.
             --generators-dir <path/to/generators> \
             --planner-time-limit 60 \
             tetris <path/to/singularity-planner.img>
+
+
+## Finding Duplicate Tasks
+
+After generating the benchmark tasks, you might want to run the
+`find-duplicate-instances.py` script to detect duplicates.

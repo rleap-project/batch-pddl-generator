@@ -11,7 +11,10 @@ import sys
 DIR = Path(__file__).resolve().parent
 REPO = DIR.parent
 
-DOWNWARD_DIR = Path(os.environ["DOWNWARD_REPO"])
+try:
+    DOWNWARD_DIR = Path(os.environ["DOWNWARD_REPO"])
+except KeyError:
+    sys.exit("Error: the DOWNWARD_REPO environment variable must point to a Fast Downward repo.")
 TRANSLATOR_DIR = DOWNWARD_DIR / "src" / "translate"
 
 sys.path.insert(0, str(TRANSLATOR_DIR))
@@ -27,7 +30,7 @@ def dump_task(task):
     # print(f"Domain: {task.domain_name}")
     # print(f"Task: {task.task_name}")
     # print(f"Requirements: {sorted(task.requirements.requirements)}")
-    #print(f"Types: {sorted(repr(typ) for typ in task.types)}")
+    # print(f"Types: {sorted(repr(typ) for typ in task.types)}")
     print(f"Objects: {sorted(str(obj) for obj in task.objects)}")
     print("Predicates:")
     for pred in task.predicates:
