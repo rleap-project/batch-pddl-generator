@@ -352,6 +352,13 @@ DOMAINS = [
         ],
     ),
     Domain(
+        "tsp",
+        "tsp -n {locations}",
+        [
+            get_int("locations", lower=2, upper=20),
+        ],
+    ),
+    Domain(
         "visitall",
         "grid -x {grid_width} -y {grid_height} -u {unavailable_cells} -r {ratio_goal_cells} -s {seed}",
         [
