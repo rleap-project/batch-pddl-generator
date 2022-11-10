@@ -13,10 +13,12 @@ Create a virtual environment:
     pip install -U pip wheel
     pip install -r requirements.txt
 
-Clone repo with PDDL generators:
+Clone repo with PDDL generators, and build the generators:
 
     git clone git@github.com:AI-Planning/pddl-generators.git
-
+    cd pddl-generators
+    ./build_all
+    
 
 ## Usage
 
