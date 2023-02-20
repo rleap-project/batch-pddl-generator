@@ -42,12 +42,8 @@ def dump_task(task):
     for fact in sorted(str(f) for f in task.init):
         print(f"  {fact}")
     print("Goal:")
-    if isinstance(task.goal, pddl.Atom):
-        print(f"  {task.goal}")
-    else:
-        for atom in sorted(str(p) for p in task.goal.parts):
-            print(f"  {atom}")
-    # TODO: sort conditions in actions and axioms.
+    # TODO: sort conditions in actions, axioms and goals.
+    task.goal.dump()
     print("Actions:")
     for action in sorted(task.actions, key=lambda a: a.name):
         action.dump()
