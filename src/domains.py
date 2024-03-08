@@ -95,6 +95,9 @@ def adapt_parameters_grid(parameters):
     if len(parameters["keys"]) != parameters["shapes"]:
         raise IllegalConfiguration("number of shapes does not fit the given vector of keys and locks")
     parameters["locks"] = parameters["keys"]
+    num_locks = sum(int(char) for char in parameters["locks"])
+    if num_locks >= parameters["x"] * parameters["y"]:
+        raise IllegalConfiguration("All locations will be locked.")
     return parameters
 
 
@@ -111,7 +114,7 @@ def adapt_parameters_tidybot(parameters):
 
 
 def adapt_parameters_spanner(parameters):
-    if parameters["num_nuts"] > parameters["num_spanners"]:
+    if parameters["num_nuts"] != parameters["num_spanners"]:
         raise IllegalConfiguration("num_nuts must be <= num_spanners")
     return parameters
 
@@ -250,9 +253,9 @@ DOMAINS = [
         "barman",
         "barman-generator.py {cocktails} {ingredients} {shots} {seed}",
         [
-            get_int("cocktails", lower=1, upper=2),
-            get_int("shots", lower=1, upper=2),
-            get_int("ingredients", lower=2, upper=3),
+            get_int("cocktails", lower=1, upper=3),
+            get_int("shots", lower=1, upper=3),
+            get_int("ingredients", lower=1, upper=4),
         ],
         adapt_parameters=adapt_parameters_barman,
     ),
@@ -260,16 +263,38 @@ DOMAINS = [
         "blocksworld",
         "blocksworld 4 {n}",
         [
-            get_enum("n", choices=[3]),
+            get_int("n", lower=1, upper=10),
         ],  # training
-        # [get_int("n", lower=10, upper=20)],  # testing
+        #[
+        #    get_int("n", lower=31, upper=80)
+        #],  # testing
+    ),
+    Domain(
+        "blocksworld_clear",
+        "blocksworld 3 {n}",
+        #[
+        #    get_int("n", lower=2, upper=4),
+        #],  # training
+        [
+            get_int("n", lower=1, upper=5, step_size=1)
+        ],  # testing
+    ),
+    Domain(
+        "blocksworld_on",
+        "blocksworld 3 {n}",
+        #[
+        #    get_int("n", lower=2, upper=4),
+        #],  # training
+        [
+            get_int("n", lower=1, upper=5, step_size=1)
+        ],  # testing
     ),
     Domain(
         "childsnack",
         "child-snack-generator.py pool {seed} {children} {trays} {gluten_factor} {constrainedness}",
         [
-            get_int("children", lower=2, upper=5),            
-            get_int("trays", lower=1, upper=2),
+            get_int("children", lower=1, upper=3),
+            get_enum("trays", choices=[1]),
             get_float("gluten_factor", lower=0., upper=1., precision=0.5),
             get_enum("constrainedness", choices=[1.0]),
         ],
@@ -290,6 +315,25 @@ DOMAINS = [
             get_int("packages", lower=4, upper=5),
             get_int("roadjunctions", lower=4, upper=5),
             get_int("trucks", lower=4, upper=5),
+        ],
+    ),
+    Domain(
+        "logistics",
+        "logistics -a {num_airplanes} -c {num_cities} -s {city_size} -p {num_packages} -t {num_trucks} -r {seed}",
+        # training
+        #[
+        #    get_int("drivers", lower=1, upper=2),
+        #    get_int("packages", lower=1, upper=2),
+        #    get_int("roadjunctions", lower=2, upper=3),
+        #    get_int("trucks", lower=1, upper=2),
+        #],
+        # testing
+        [
+            get_int("num_airplanes", lower=1, upper=2),
+            get_int("num_cities", lower=1, upper=2),
+            get_int("city_size", lower=1, upper=2),
+            get_int("num_packages", lower=1, upper=2),
+            get_int("num_trucks", lower=1, upper=2),
         ],
     ),
     Domain(
@@ -319,11 +363,11 @@ DOMAINS = [
         "grid",
         "./grid -x {x} -y {y} -t {shapes} -k {keys} -l {locks} -p {prob_key_in_goal} -s {seed}",
         [
-            get_int("x", lower=2, upper=3),
-            get_int("y", lower=2, upper=3),
-            get_int("shapes", lower=1, upper=2),
+            get_int("x", lower=1, upper=3),
+            get_int("y", lower=1, upper=3),
+            get_enum("shapes", choices=[1,2]),
             get_enum("keys", choices=["0", "1", "2", "20", "02", "11"]),
-            get_enum("prob_key_in_goal", choices=[100]),
+            get_enum("prob_key_in_goal", choices=[50, 100]),
         ],
         adapt_parameters=adapt_parameters_grid,
     ),
@@ -419,11 +463,11 @@ DOMAINS = [
         "-Q {prob_cylindrical_goal} -W {prob_color_init} -E {prob_color_goal} "
         "-R {prob_hole_init} -T {prob_hole_goal} -Y {prob_surface_goal} -r {seed}",
         [
-            get_int("parts", lower=1, upper=2, log=False),
-            get_int("shapes", lower=0, upper=2, log=False),
-            get_int("colors", lower=1, upper=2, log=False),
-            get_int("widths", lower=1, upper=2, log=False),
-            get_int("orientations", lower=1, upper=2, log=False),
+            get_int("parts", lower=2, upper=4, log=False),
+            get_int("shapes", lower=2, upper=4, log=False),
+            get_int("colors", lower=2, upper=4, log=False),
+            get_int("widths", lower=2, upper=4, log=False),
+            get_int("orientations", lower=2, upper=4, log=False),
             get_enum("prob_cylindrical_goal", choices=[100]),
             get_enum("prob_color_init", choices=[100]),
             get_enum("prob_color_goal", choices=[100]),
@@ -437,11 +481,11 @@ DOMAINS = [
         "tpp -s {seed} -m {markets} -p {products} -t {trucks} -d {depots} -l {goods} "
         + TMP_PROBLEM,
         [
-            get_int("products", lower=1, upper=2),
-            get_int("markets", lower=1, upper=2),
-            get_int("trucks", lower=1, upper=2),
-            get_int("depots", lower=1, upper=2),
-            get_int("goods", lower=1, upper=2),
+            get_int("products", lower=1, upper=3),
+            get_int("markets", lower=1, upper=3),
+            get_int("trucks", lower=1, upper=3),
+            get_int("depots", lower=1, upper=3),
+            get_int("goods", lower=1, upper=3),
         ],
     ),
     Domain(
@@ -449,34 +493,43 @@ DOMAINS = [
         "spanner-generator.py "
         "{num_spanners} {num_nuts} {num_locations}",
         [
-            get_int("num_spanners", lower=2, upper=4),
-            get_int("num_nuts", lower=2, upper=4),
+            get_int("num_spanners", lower=1, upper=3),
+            get_int("num_nuts", lower=1, upper=3),
             get_int("num_locations", lower=1, upper=3)
         ],
         adapt_parameters=adapt_parameters_spanner,
     ),
     Domain(
-        "miconic-strips",
+        "miconic",
         "miconic -f {num_floors} -p {num_passengers}",
+        # training
         [
-            get_int("num_floors", lower=2, upper=3),
-            get_int("num_passengers", lower=2, upper=3)
+            get_int("num_floors", lower=1, upper=4),
+            get_int("num_passengers", lower=1, upper=4)
         ]
+        # testing
+        #[
+        #    get_int("num_floors", lower=20, upper=30),
+        #    get_int("num_passengers", lower=20, upper=30)
+        #]
     ),
     Domain(
         "visitall",
         "grid -n {size_square_grid} -r {ratio_cells_in_goal} -u {num_cells_unavailable} -s {seed}",
         [
-            get_int("size_square_grid", lower=2, upper=3),
+            get_int("size_square_grid", lower=1, upper=4),
             get_float("ratio_cells_in_goal", lower=0.5, upper=1.0, precision=0.5),
-            get_int("num_cells_unavailable", lower=1, upper=2),
+            get_int("num_cells_unavailable", lower=1, upper=4),
         ]
     ),
     Domain(
         "gripper",
         "gripper -n {num_objects}",
+        # [
+        #     get_int("num_objects", lower=1, upper=5),
+        # ]
         [
-            get_int("num_objects", lower=1, upper=5),
+            get_int("num_objects", lower=1, upper=10),
         ]
     ),
     Domain(
